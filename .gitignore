@@ -1,0 +1,4 @@
+venv/
+scripts/coronadb.py
+.idea
+scripts/__pycache__
