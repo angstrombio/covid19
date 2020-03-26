@@ -16,6 +16,10 @@ def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_exist
             load_file(conn, source, get_filedate(os.path.basename(source)), reload, skip_existing)
         else:
             print("Invalid source location")
+            return False
+
+        refresh_mv(conn)
+
 
 def find_source_dir(jhu_dir):
     # For convenience - if we were passed the route of the JHU git structure, navigate to the right folder
@@ -107,7 +111,7 @@ def parse_original_format(db, file_date, lines, has_coordinates):
             cases = row[3]
             deaths = row[4]
             recovered = row[5]
-            if (has_coordinates):
+            if has_coordinates:
                 lat = row[6]
                 long = row[7]
             else:
@@ -150,23 +154,9 @@ def get_db_connection(host, port, name, user, pw):
 def insert_row(cursor, file_date, fips, country, state, county, lat, long, last_update, cases, deaths, recovered, active, combined_key):
     cursor.execute("""
         INSERT INTO covid19.jhu (file_date, fips, country, state, county, lat, long, last_update, cases, deaths, recovered, active, combined_key)
-        VALUES (%(file_date)s, %(fips)s, %(country)s, %(state)s, %(county)s, %(lat)s, %(long)s, %(last_update)s, %(cases)s, %(deaths)s, %(recovered)s, %(active)s, %(combined_key)s)
-    """,
-                {
-                    "file_date": file_date,
-                    "fips": fips,
-                    "country": country,
-                    "state": state,
-                    "county": county,
-                    "lat": lat,
-                    "long": long,
-                    "last_update": last_update,
-                    "cases": parse_number(cases),
-                    "deaths": parse_number(deaths),
-                    "recovered": parse_number(recovered),
-                    "active": parse_number(active),
-                    "combined_key": combined_key
-                })
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                   (file_date, fips, country, state, county, lat, long, last_update,parse_number(cases),
+                    parse_number(deaths), parse_number(recovered), parse_number(active), combined_key))
 
 
 def check_existing_data(db, file_date):
@@ -184,11 +174,14 @@ def clear_all_data(db):
     print("Cleaned database")
 
 
+def refresh_mv(db):
+    with db.cursor() as cursor:
+        cursor.execute("REFRESH MATERIALIZED VIEW covid19.jhu_derived")
+
+
 def clear_file_data(db, file_date):
     with db.cursor() as cursor:
-        cursor.execute("""
-            DELETE FROM covid19.jhu WHERE file_date=%(file_date)s
-        """, { "file_date": file_date})
+        cursor.execute("DELETE FROM covid19.jhu WHERE file_date=%s", (file_date,))
 
     db.commit()
     print("Removed data for " + file_date)
