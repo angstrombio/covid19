@@ -29,14 +29,13 @@ def load(areas_geojsonfile, state_outlines_geojsonfile, mergecounties_geojsonfil
 
     if level == 'combined':
         print("Exporting Metro Areas")
-        areas = load_data_into_geo(areas_geojsonfile, level)
+        areas = load_data_into_geo(areas_geojsonfile, 'msa')
         print("Examining counties to merge")
         merge = load_data_into_geo(mergecounties_geojsonfile, 'counties_not_in_msa')
         county_count = 0
         for feature in merge:
-            if feature.properties['ID'] != "REMOVE":
-                areas.add_feature(feature)
-                county_count += 1
+            areas.add_feature(feature)
+            county_count += 1
         print("Merged " + str(county_count) + " counties")
     else:
         print("Exporting Areas")
@@ -49,7 +48,7 @@ def load(areas_geojsonfile, state_outlines_geojsonfile, mergecounties_geojsonfil
         print("Exporting State Outlines")
         states = pygeoj.load(filepath=state_outlines_geojsonfile)
         for feature in states:
-            feature.properties = {"Metro Area": feature.properties["NAME"] + " (State)"}
+            feature.properties = {"Area": feature.properties["NAME"], "Area Type": "State"}
 
         for feature in areas:
             states.add_feature(feature)
@@ -70,6 +69,8 @@ def load_data_into_geo(geojson_file, level):
     :param level:           Whether to load msa, county, or counties not in an msa
     """
     geo_features = pygeoj.load(filepath=geojson_file)
+    output_features = pygeoj.new()
+    output_features.define_crs('name', name='name": "urn:ogc:def:crs:EPSG::4269')
 
     total = len(geo_features)
     count = 1
@@ -81,7 +82,7 @@ def load_data_into_geo(geojson_file, level):
                 if level == 'msa':
                     area_id = feature.properties['CBSAFP']
                 else:
-                    area_id = feature.properties['FIPS']  # TODO JP confirm what is in the file
+                    area_id = feature.properties['GEOID']
 
                 # noinspection SqlResolve
                 base_query = """SELECT cbsa, fips, area_name, area_type, population,
@@ -100,13 +101,8 @@ def load_data_into_geo(geojson_file, level):
 
                 cursor.execute(query, (area_id,))
                 result = cursor.fetchone()
-                if result is None:
-                    # Note that the GeoJSON file has regions for PR, which we don't have any data for, so we skip them here
-                    # We also are skipping counties that don't match when in counties_not_in_msa mode
-                    if level == 'counties_not_in_msa':
-                        feature.properties = {"ID": "REMOVE"}
-
-                else:
+                # Note that the GeoJSON file has regions for PR and other US terriotiries, which we don't have any data for, so we skip them here
+                if result is not None:
                     # We are going to recreate the properties for each feature (metro area) in our GeoJSON file - we don't really want any
                     # of the original properties, and will instead fill in information we loaded from the DB
                     feature.properties = {"ID": area_id, "Area": result[2], "Area Type": result[3],
@@ -133,6 +129,7 @@ def load_data_into_geo(geojson_file, level):
                     set_rounded_property(feature.properties, "Cases per Hospital Bed (Licensed)", result[21], 2)
                     set_rounded_property(feature.properties, "Cases per Hospital Bed (Staffed)", result[22], 2)
                     set_rounded_property(feature.properties, "Cases per ICU Bed", result[23], 2)
+                    output_features.add_feature(feature)
 
                 # Double-checking whether a CBSA might have matched multiple places - e.g., we have errors/mismatches in our data
                 # This doesn't happen in the correct, underlying datasets, but checking to make sure we haven't made a mistake
@@ -144,7 +141,7 @@ def load_data_into_geo(geojson_file, level):
 
                 count = count + 1
     print()
-    return geo_features
+    return output_features
 
 
 # Main part of the script: just examine/verify command line and invoke our loader

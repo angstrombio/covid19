@@ -18,7 +18,8 @@ def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_exist
             print("Invalid source location")
             return False
 
-        refresh_mv(conn)
+        # TODO Need to fix this; don't currently have permission to do this
+        # refresh_mv(conn)
 
 
 def find_source_dir(jhu_dir):
