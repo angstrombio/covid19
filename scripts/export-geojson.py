@@ -28,18 +28,25 @@ def load(areas_geojsonfile, state_outlines_geojsonfile, mergecounties_geojsonfil
     """
 
     if level == 'combined':
+        print("Exporting Metro Areas")
         areas = load_data_into_geo(areas_geojsonfile, level)
+        print("Examining counties to merge")
         merge = load_data_into_geo(mergecounties_geojsonfile, 'counties_not_in_msa')
+        county_count = 0
         for feature in merge:
             if feature.properties['ID'] != "REMOVE":
                 areas.add_feature(feature)
+                county_count += 1
+        print("Merged " + str(county_count) + " counties")
     else:
+        print("Exporting Areas")
         areas = load_data_into_geo(areas_geojsonfile, level)
 
     # As a second step, we are loading a GeoJSON for the state outlines, and merging our area data from above into it
     # We'll strip the existing features in the state-level file (just making note of the name), and then put
     # the MSA data at the end so it sits on top of the states.
     if state_outlines_geojsonfile is not None:
+        print("Exporting State Outlines")
         states = pygeoj.load(filepath=state_outlines_geojsonfile)
         for feature in states:
             feature.properties = {"Metro Area": feature.properties["NAME"] + " (State)"}
@@ -49,6 +56,7 @@ def load(areas_geojsonfile, state_outlines_geojsonfile, mergecounties_geojsonfil
 
         areas = states
 
+    print("Saving Export File")
     areas.save(output_geojsonfile)
 
 
@@ -111,11 +119,11 @@ def load_data_into_geo(geojson_file, level):
                     set_property(feature.properties, "Increase in Cases Today", result[10])
                     # set_property(feature.properties, "Increase over 2 Days", result[11])
                     # set_property(feature.properties, "Increase over 3 Days", result[12])
-                    if result[10] is not None:
+                    if result[13] is not None:
                         set_rounded_property(feature.properties, "% Increase in Cases Today", result[13] * 100, 1)
-                    # if result[10] is not None:
+                    # if result[14] is not None:
                     #    set_rounded_property(feature.properties, "% Increase in Cases over 2 Days", result[14] * 100, 1)
-                    # if result[10] is not None:
+                    # if result[15] is not None:
                     #    set_rounded_property(feature.properties, "% Increase in Cases over 3 Days", result[15] * 100, 1)
                     set_property(feature.properties, "# of Hospitals", result[16])
                     set_property(feature.properties, "# of Hospital Beds (Licensed)", result[17])
@@ -138,17 +146,13 @@ def load_data_into_geo(geojson_file, level):
     print()
     return geo_features
 
+
 # Main part of the script: just examine/verify command line and invoke our loader
 parser = argparse.ArgumentParser(description='Script to load Census data into the database')
 parser.add_argument("--input", required=True, type=str, help="MSA or counties GeoJSON File to load")
 parser.add_argument("--mergecounties", type=str, help="Counties GeoJSON file to merge in combined mode")
 parser.add_argument("--stateoutlines", type=str, help="State outline GeoJSON File to load")
-parser.add_argument("--output", type=str, help="Output file to save") 
+parser.add_argument("--output", required=True, type=str, help="Output file to save")
 parser.add_argument("--level", required=True, choices=['msa', 'counties', 'combined'], help="Whether to output MSA data, county data, or combined data")
 args = parser.parse_args()
-if args.states is None and args.states_output is not None:
-    print("Please specify a states input file if states output is required")
-elif args.states_output is None and args.msa_output is None:
-    print("No output file specified")
-else:
-    load(args.input, args.stateoutlines, args.mergecounties, args.output, args.level)
+load(args.input, args.stateoutlines, args.mergecounties, args.output, args.level)
