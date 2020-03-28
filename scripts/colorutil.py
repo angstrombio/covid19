@@ -1,6 +1,7 @@
 import numpy as np
 
-def ChooseColor(n1, n2):
+
+def choose_color(n1, n2):
     """
     Function to choose a color based on a pair of case counts.
     Logic:
@@ -16,7 +17,7 @@ def ChooseColor(n1, n2):
     :return: The value  is an r, g, b tuple where each color varies from 0 to 1
     """
     fac = 10.0
-    if (n1 > 0 and n2 > 0):
+    if n1 > 0 and n2 > 0:
         val = fac * np.log(n1 / n2)
         r = -min(val, 0.0) / (1.0 - min(val, 0.0))
         g = 1.0 / (1.0 + abs(val))
@@ -26,17 +27,16 @@ def ChooseColor(n1, n2):
         g = sat * g + (1.0 - sat)
         b = sat * b + (1.0 - sat)
     else:
-        if n1 <= 0 and n2 > 0:
+        if n1 <= 0 < n2:
             r = 1.0
             g = 0.0
             b = 0.0
+        elif n1 > 0 >= n2:
+            r = 0.0
+            g = 0.0
+            b = 1.0
         else:
-            if n1 > 0 and n2 <= 0:
-                r = 0.0
-                g = 0.0
-                b = 1.0
-            else:
-                r = 1.0
-                g = 1.0
-                b = 1.0
-    return(r,g,b)
+            r = 1.0
+            g = 1.0
+            b = 1.0
+    return r, g, b
