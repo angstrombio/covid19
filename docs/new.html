@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Mapping COVID-19</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="map.css" />
+</head>
+<body>
+    <div class="container-fluid bg-dark text-white">
+        <nav class="navbar dark navbar-expand-md bg-dark justify-content-center">
+            <a href="https://www.angstrom.bio" class="navbar-brand d-flex w-50 mr-auto"><img height='50' width="109"  src='http://www-dev.angstrom.bio/wp-content/uploads/2020/03/angstrom_web2_for_site_340_156_white.png' alt='Angstrom Bio' title='' /></a>
+            <div class="navbar-collapse collapse w-100" id="collapsingNavbar3">
+                <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
+<!--                    <li class="nav-item">
+                        <a class="nav-link" href="#">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Menu</a>
+                    </li>-->
+                </ul>
+            </div>
+        </nav>
+        <div class="container p-3 my-3 bg-white text-dark">
+            <h1>Mapping COVID-19</h1>
+            <div class="p-3">General overview here.  Include intro, rationale, link to blog post, link to Angstrom site, etc.
+            <div id="map-options">
+                <label for="data-field">Color Based One:</label>
+                <select id="data-field"></select>
+                <label for="data-color-scheme">Scheme: </label>
+                <select id="data-color-scheme"></select>
+                <label for="field-min">Min:</label>
+                <input type="text" id="field-min" size="6"/>
+                <label for="field-max">Max:</label>
+                <input type="text" id="field-max" size="6"/>
+                <input type="checkbox" id="msa-only"><label for="msa-only">Only show data for MSAs</label>
+                <br/>
+                <label for="history-range">Timeline: </label>
+                <input type="range" id="history-range" class="slider" style="width: 300px">
+                <span id="history-range-label"></span>
+            </div>
+            <div id="map-content">
+                <div id="legend"></div>
+            </div>
+            <div id="map-text"></div>
+            <div class="tooltip" id="tooltip"></div>
+        </div>
+    </div>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="map.js"></script>
+</body>
+</html>

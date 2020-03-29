@@ -26,6 +26,16 @@ def load(areas_geojsonfile, state_outlines_geojsonfile, mergecounties_geojsonfil
     :param output_geojsonfile: Output file
     :param level: msa, counties, or combined
     """
+    if areas_geojsonfile is None or areas_geojsonfile == "":
+        # Use defaults
+        if level == 'msa':
+            areas_geojsonfile = "../data/msa-input.geojson"
+        elif level == 'counties':
+            areas_geojsonfile = "../data/counties_input.geojson"
+        elif level == 'combined':
+            areas_geojsonfile = "../data/msa-input.geojson"
+            if (mergecounties_geojsonfile is None or mergecounties_geojsonfile == ""):
+                mergecounties_geojsonfile = "../data/counties_input.geojson"
 
     if level == 'combined':
         print("Exporting Metro Areas")
@@ -146,7 +156,7 @@ def load_data_into_geo(geojson_file, level):
 
 # Main part of the script: just examine/verify command line and invoke our loader
 parser = argparse.ArgumentParser(description='Script to load Census data into the database')
-parser.add_argument("--input", required=True, type=str, help="MSA or counties GeoJSON File to load")
+parser.add_argument("--input", type=str, help="MSA or counties GeoJSON File to load")
 parser.add_argument("--mergecounties", type=str, help="Counties GeoJSON file to merge in combined mode")
 parser.add_argument("--stateoutlines", type=str, help="State outline GeoJSON File to load")
 parser.add_argument("--output", required=True, type=str, help="Output file to save")

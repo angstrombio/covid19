@@ -40,3 +40,8 @@ def choose_color(n1, n2):
             g = 1.0
             b = 1.0
     return r, g, b
+
+
+def choose_color_hex(n1, n2):
+    r, g, b = choose_color(n1, n2)
+    return '#%02x%02x%02x' % (np.int(r * 255.0), np.int(g * 255.0), np.int(b * 255))

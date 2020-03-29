@@ -126,7 +126,7 @@ CREATE MATERIALIZED VIEW covid19.jhu_derived AS
         and prior3.country=x.country
         and ((prior3.state is null and x.state is null) or (prior3.state=x.state))
         and ((prior3.county is null and x.county is null) or (prior3.county=x.county))
-        and ((prior3.fips is null and x.fips is null) or (prior3.fips=x.fips))
+        and ((prior3.fips is null and x.fips is null) or (prior3.fips=x.fips));
 
 
 CREATE VIEW covid19.cases_us_all AS select * from covid19.jhu_derived WHERE country='US';
@@ -138,7 +138,7 @@ create view covid19.healthcare_counties as
     select fips, county_name, state_name, count(src.objectid) as num_hospitals, sum(num_licensed_beds) as licensed_beds, sum(num_staffed_beds) as staffed_beds, sum(num_icu_beds) as icu_beds, case when count(calc.utilized_beds) is null then null else sum(calc.utilized_beds)/sum(calc.beds_to_combine) end as combined_bed_utilization
     from covid19.def_healthcare_data src
     left outer join (select objectid, bed_utilization*num_licensed_beds as utilized_beds, num_licensed_beds as beds_to_combine from covid19.def_healthcare_data where bed_utilization is not null) as calc on src.objectid=calc.objectid
-    group by fips, county_name, state_name
+    group by fips, county_name, state_name;
 
 
 create view covid19.healthcare_msa as
@@ -215,4 +215,65 @@ create view covid19.cases_and_healthcare_by_combined_areas as (
     select * from covid19.cases_and_healthcare_by_msa
     UNION ALL
     select * from covid19.cases_and_healthcare_by_county where fips not in (select fips_stcou from covid19.census_msa_counties)
+);
+
+
+-- NEW MSA:
+create view covid19.cases_and_healthcare_historical_by_msa as (
+    select msa.cbsa as cbsa,
+        null as fips,
+        msa.msa_name as area_name,
+        msa.msa_type as area_type,
+        msa.pop_2018 as population,
+        cases.file_date as file_date,
+        sum(cases.cases) as cases,
+        case when msa.pop_2018 is null then null else sum(cases.cases)::float/msa.pop_2018*10000 end as cases_per_10k_people,
+        sum(cases.deaths) as deaths,
+        sum(recovered) as recovered,
+        sum(active) as active,
+        sum(cases_delta) as increase_yesterday,
+        hc.num_hospitals,
+        hc.licensed_beds,
+        hc.staffed_beds,
+        hc.icu_beds,
+        hc.combined_bed_utilization,
+        case when hc.licensed_beds is null or hc.licensed_beds=0 then null else sum(cases.cases::float)/hc.licensed_beds end as cases_per_licensed_bed,
+        case when hc.staffed_beds is null or hc.staffed_beds=0 then null else sum(cases.cases::float)/hc.staffed_beds end as cases_per_staffed_bed,
+        case when hc.icu_beds is null or hc.icu_beds=0 then null else sum(cases.cases::float)/hc.icu_beds end as cases_per_icu_bed
+    from covid19.census_msa msa
+        inner join covid19.census_msa_counties mc on msa.cbsa=mc.cbsa
+        left outer join covid19.jhu_derived cases on cases.fips=mc.fips_stcou
+        left outer join covid19.healthcare_msa hc on hc.cbsa=msa.cbsa
+    group by msa.cbsa, msa.msa_type, msa.msa_name, msa.pop_2018, cases.file_date, hc.num_hospitals, hc.licensed_beds, hc.staffed_beds, hc.icu_beds, hc.combined_bed_utilization
+    order by msa.cbsa, cases.file_date desc
+);
+-- COUNTIES NEW:
+create view covid19.cases_and_healthcare_historical_by_county as (
+    select 0 as cbsa,
+        counties.fips as fips,
+        concat(counties.county, ', ', states.abbreviation) as area_name,
+        'County' as area_type,
+        counties.pop_2018 as population,
+        cases.file_date as file_date,
+        sum(cases.cases) as cases,
+        case when counties.pop_2018 is null then null else sum(cases.cases)::float/counties.pop_2018*10000 end as cases_per_10k_people,
+        sum(cases.deaths) as deaths,
+        sum(recovered) as recovered,
+        sum(active) as active,
+        sum(cases_delta) as increase_yesterday,
+        hc.num_hospitals,
+        hc.licensed_beds,
+        hc.staffed_beds,
+        hc.icu_beds,
+        hc.combined_bed_utilization,
+        case when hc.licensed_beds is null or hc.licensed_beds=0 then null else sum(cases.cases::float)/hc.licensed_beds end as cases_per_licensed_bed,
+        case when hc.staffed_beds is null or hc.staffed_beds=0 then null else sum(cases.cases::float)/hc.staffed_beds end as cases_per_staffed_bed,
+        case when hc.icu_beds is null or hc.icu_beds=0 then null else sum(cases.cases::float)/hc.icu_beds end as cases_per_icu_bed
+    from covid19.census counties
+        inner join covid19.states states on counties.state=states.state_name
+        left outer join covid19.jhu_derived cases on cases.fips=counties.fips
+        left outer join covid19.healthcare_counties hc on hc.fips=counties.fips
+    where counties.county_num <> 0
+    group by counties.fips, counties.county, counties.state, states.abbreviation, counties.pop_2018, cases.file_date, hc.num_hospitals, hc.licensed_beds, hc.staffed_beds, hc.icu_beds, hc.combined_bed_utilization
+    order by counties.fips, cases.file_date desc
 );
