@@ -103,9 +103,9 @@ function initializeMap() {
     loadSettings(FieldDetails[MapOptions.currentField]);
     MapOptions.disableAutoUpdates = false;
 
-    d3.json('2020-03-28-metadata.json', function (metadata) {
+    d3.json('data/2020-03-28-metadata.json', function (metadata) {
         updateMetadata(metadata);
-        d3.json('2020-03-28-cases-healthcare-history.geojson', function (geojson) {
+        d3.json('data/2020-03-28-cases-healthcare-history.geojson', function (geojson) {
             drawMap(geojson);
             drawLegend(getCurrentSettings());
         });
