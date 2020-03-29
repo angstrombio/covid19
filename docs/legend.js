@@ -1,4 +1,8 @@
 function drawLegend(currentSettings) {
+    if (currentSettings.colorScheme.startsWith('David')) {
+        d3.select("#legend").select('svg').select('rect').remove();
+        return;
+    }
     let interpolator = getColorInterpolator(currentSettings);
     var width = 200;
     var height = 15;
@@ -43,7 +47,6 @@ function drawLegend(currentSettings) {
             } else {
                 pct = (value - colorMin)/(colorMax - colorMin);
             }
-            console.log(pct);
             return interpolator(pct);
         })
         .exit().remove();

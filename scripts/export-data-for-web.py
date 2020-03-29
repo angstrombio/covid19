@@ -3,6 +3,8 @@ import psycopg2
 import coronadb
 import argparse
 import json
+import numpy as np
+from fitutil import Fit
 
 def set_property(metadata, properties, title, value, round_digits=None):
     """ Helper method to set a property in the GeoJSON properties, skipping it if is null/empty """
@@ -63,7 +65,9 @@ def load(areas_geojsonfile, mergecounties_geojsonfile, output_geojsonfile, outpu
         "deaths": {"min": 0, "max": 0},
         "cases_per_bed": {"min": 0, "max": 0},
         "cases_per_icu_bed": {"min": 0, "max": 0},
-        "population": {"min": 999999, "max": 0}
+        "population": {"min": 999999, "max": 0},
+        "cases_fit": {"min": 1, "max": 0},
+        "increase": {"min": 0, "max": 0}
     }
 
     print("Exporting Metro Areas")
@@ -132,8 +136,9 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                     file_date = result[5].strftime('%Y-%m-%d')
                     if metadata['last_file_date'] is None or file_date > metadata['last_file_date']:
                         metadata['last_file_date'] = file_date
+                    cases_today = result[6]
 
-                    set_property(metadata, feature.properties, "cases", result[6])
+                    set_property(metadata, feature.properties, "cases", cases_today)
 
 
                     set_property(metadata, feature.properties, "cases_per_10k_people", result[7], round_digits=2)
@@ -164,11 +169,15 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                     continue_per_bed = True
                     continue_per_icu = True
 
+                    num_days_with_cases = 0
+
                     for result in history_rows:
                         # Process historical data
                         has_history = True
                         append_history(True, date_history, result[5], date_format='%Y-%m-%d')
                         cases_history.append(result[6])
+                        if result[6] > 0:
+                            num_days_with_cases += 1
                         continue_per_capita = append_history(continue_per_capita, cases_per_10k_people_history, result[7], round_digits=2)
                         continue_deaths = append_history(continue_deaths, deaths_history, result[8])
                         # continue_recovered = append_history(continue_recovered, recovered_history, result[9])
@@ -188,6 +197,18 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                         # feature.properties['active_history'] = active_history
                         feature.properties['cases_per_bed_history'] = cases_per_bed_history
                         feature.properties['cases_per_icu_bed_history'] = cases_per_icu_bed_history
+
+                        if num_days_with_cases > 2:
+                            nlen = len(cases_history) + 1
+                            t = np.arange(0.0, nlen, 1.0)
+                            n = np.empty(nlen)
+                            for i in range(1, nlen):
+                                n[i] = cases_history[nlen-i-1]
+                            n[0] = cases_today
+
+                            fit_value = Fit(t, n)
+                            if not np.isnan(fit_value):
+                                set_property(metadata, feature.properties, "cases_fit", fit_value, round_digits=4)
 
                     output_features.add_feature(feature)
 

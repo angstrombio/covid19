@@ -30,6 +30,10 @@ function initializeControls() {
         .text(function(d) { return d; })
         .attr('value', function(d) { return d; });
     colorSelector.on('change', function() {
+        if (d3.select("#data-color-scheme").property('value').startsWith('David') && MapOptions.currentField !== 'cases') {
+            alert("Can only use this scheme for cases");
+            d3.select("#data-color-scheme").property('value', 'Reds');
+        }
         updateMap();
     });
     d3.select("#field-min")

@@ -50,8 +50,9 @@ function addToolTipHTML(tooltip, feature, backgroundColor) {
     tooltip.select(".tooltip-header").html(feature.properties.area);
 
     MapOptions.tooltipFields.forEach(function(field) {
-        d3.select("#tooltip-value-" + field).html(getToolTipFieldValue(feature, field));
-        d3.select("#tooltip-colorblock-" + field).style('background-color', getToolTipColorCell(feature, backgroundColor, field));
+        value = getToolTipFieldValue(feature, field)
+        d3.select("#tooltip-value-" + field).html(value);
+        d3.select("#tooltip-colorblock-" + field).style('background-color', getToolTipColorCell(feature, backgroundColor, field, value));
     });
 
     return tooltip;
@@ -70,7 +71,7 @@ function getToolTipFieldValue(feature, field) {
     return value;
 }
 
-function getToolTipColorCell(feature, defaultBackgroundColor, field) {
+function getToolTipColorCell(feature, defaultBackgroundColor, field, value) {
     let settings = FieldDetails[field];
     if (value != null && settings.colorScheme != null) {
         return getColorMapFunction(field, settings)(feature);

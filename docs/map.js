@@ -1,7 +1,7 @@
 MapOptions = {
-    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
-    fieldOptions: ['cases', 'deaths', 'increase', 'population', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed'],
-    tooltipFields: ['cases', 'deaths', 'increase', 'population', 'hospitals', 'hospital_beds', 'icu_beds', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed'],
+    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow','David-1', 'David-2', 'David-3', 'David-4'],
+    fieldOptions: ['cases', 'deaths', 'increase', 'population', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed', 'cases_fit'],
+    tooltipFields: ['cases', 'deaths', 'increase', 'population', 'hospitals', 'hospital_beds', 'icu_beds', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed', 'cases_fit'],
 
     targetWidth: 700,
     targetHeight: 425,
@@ -25,7 +25,8 @@ FieldDetails = {
     cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", min: 0, max: 5, format: '.2f'},
     hospitals: {label: "# of Hospitals", format: ',d'},
     hospital_beds: {label: "# of Hospital Beds", format: ',d'},
-    icu_beds: {label: "# of ICU Beds", format: ',d'}
+    icu_beds: {label: "# of ICU Beds", format: ',d'},
+    cases_fit: {label: "Cases - Fit", colorScheme: "Reds", min: 0, max: 1}
 };
 
 function updateMetadata(metadata) {
