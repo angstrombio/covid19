@@ -13,50 +13,80 @@
     <link rel="stylesheet" href="map.css" />
 </head>
 <body>
+    <a name="map"></a>
     <div class="container-fluid bg-dark text-white">
-        <nav class="navbar dark navbar-expand-sm bg-dark justify-content-center">
-            <a href="https://www.angstrom.bio" class="navbar-brand d-flex w-50 mr-auto py-0"><img height='50' width="109"  src='http://www-dev.angstrom.bio/wp-content/uploads/2020/03/angstrom_web2_for_site_340_156_white.png' alt='Angstrom Bio' title='' /></a>
-            <div class="navbar-collapse collapse w-100" id="collapsingNavbar3 py-0">
-                <ul class="nav navbar-nav ml-auto w-100 justify-content-end py-0">
-<!--                    <li class="nav-item">
-                        <a class="nav-link" href="#">Menu</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Menu</a>
-                    </li>-->
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark justify-content-center sticky-top mx-3 py-0">
+            <a class="navbar-brand d-flex w-50 mr-auto" href="https://www.angstrom.bio"><img height='50' width="109"  src='http://www-dev.angstrom.bio/wp-content/uploads/2020/03/angstrom_web2_for_site_340_156_white.png' alt='Angstrom Bio' title='' /></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-dark navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse w-100" id="collapsibleNavbar">
+                <ul class="navbar-nav w-100 justify-content-center align-items-center">
+                    <li class="nav-item"><a class="nav-link m-2" href="#map">Map</a></li>
+                    <li class="nav-item"><a class="nav-link m-2" href="#overview">Overview</a></li>
+                    <li class="nav-item"><a class="nav-link m-2" href="#definitions">Definitions</a></li>
+                    <li class="nav-item"><a class="nav-link m-2" href="#sources">Sources</a></li>
+                </ul>
+                <ul class="nav navbar-nav ml-auto w-100 justify-content-end"></ul>
+            </div>
+
+        </nav>
+        <div class="container p-3 my-1 bg-white text-dark">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-sm-9" class="align-items-center"><h3> Mapping COVID-19 Risk in the U.S.</h3></div>
+                    <div class="col-sm-3" class="align-items-center">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" area-haspopup="true" area-expanded="false" id="field-selector-dropdown">
+                            Cases per ICU Bed
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="field-selector-dropdown" id="field-selector-options">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="map-content" class="container"></div>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm"></div>
+                    <div class="d-flex">
+                            <small>Date: <span id="history-range-label"></span></small>
+                    </div>
+                    <div class="col-sm"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm"></div>
+                    <div class="d-flex align-items-center col-sm justify-content-center">
+                        <input type="range" id="history-range" class="slider custom-range" style="width: 100%">
+                        <button type="button" class="btn btn-default" aria-label="Animate" onclick="triggerTimelineAnimation()">
+                            <i id="play-button-icon" class="fa fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="col-sm"></div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <a name="overview"></a>
+                <h4>Sources</h4>
+                These maps have been created utilizing datasets from:
+                <ul>
+                    <li>Johns Hopkins University (Last Data Update: <span id="map-text">)</span></li>
+                    <li>etc.</li>
+                    <li>etc.</li>
                 </ul>
             </div>
-        </nav>
-        <div class="container-fluid p-3 my-3 bg-white text-dark">
-            <h2>Mapping COVID-19 in the U.S.</h2>
-            <div class="p-3 ">General overview here.  Include intro, rationale, link to blog post, link to Angstrom site, etc.</div>
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" area-haspopup="true" area-expanded="false" id="field-selector-dropdown">
-                    Cases per ICU Bed
-                </button>
-                <div class="dropdown-menu" aria-labelledby="field-selector-dropdown" id="field-selector-options">
-                </div>
+            <div class="container-fluid">
+                <a name="definitions"></a>
+                <h4>Sources</h4>
+                These maps have been created utilizing datasets from:
+                <ul>
+                    <li>Johns Hopkins University (Last Data Update: <span id="map-text">)</span></li>
+                    <li>etc.</li>
+                    <li>etc.</li>
+                </ul>
             </div>
-            <div id="map-content"></div>
-            
-            <div class="row">
-                <div class="col-sm-1">
-                    <label for="history-range">Timeline: </label>
-                </div>
-                <div class="col-sm-6">
-                    <input type="range" id="history-range" class="slider" style="width: 100%">
-                </div>
-                <div class="col-sm-1">
-                    <button type="button" class="btn btn-default" aria-label="Left Align" onclick="triggerTimelineAnimation()">
-                        <i id="play-button-icon" class="fa fa-play"></i>
-                    </button>
-                </div>
-            </div>
-            <div id="row">
-                <div class="col-sm-1"></div>
-                <div class="col-sm-6">Date: <span id="history-range-label"></span></div>
-            </div>
-            <div>
+            <div class="container-fluid">
+                <a name="sources"></a>
                 <h4>Sources</h4>
                 These maps have been created utilizing datasets from:
                 <ul>
