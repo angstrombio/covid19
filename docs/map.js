@@ -8,7 +8,6 @@ MapOptions = {
 
     includeCounties: true,
     currentField: "cases_per_icu_bed",
-    disableAutoUpdates: true,
     lastUpdateDate: null,
     dateHistory: [],
 
@@ -61,6 +60,7 @@ function drawMap(geojson) {
         .append('div')
         .classed('svg-container', true)
         .append('svg')
+        .classed("map-svg", true)
         .attr('preserveAspectRatio', 'xMinYMin meet')
         //.attr('preserveAspectRatio', 'mMidYMid meet')
         .attr('viewBox', '0 0 ' + MapOptions.targetWidth + ' ' + MapOptions.targetHeight)
@@ -86,29 +86,27 @@ function drawMap(geojson) {
         .attr('d', geoPath)
         .on("mouseover", getShowTooltipFunction(MapOptions, FieldDetails))
         .on("mouseout",  hideTooltipFunction);
+
+    drawLegend(MapOptions.currentField, settings, svg);
 }
 
 function updateMap() {
-    if (!MapOptions.disableAutoUpdates) {
-        let settings = getCurrentSettings();
-        d3.selectAll('path')
-            .transition()
-            .duration(1000)
-            .attr('fill', getColorMapFunction(MapOptions.currentField, settings));
-        drawLegend();
-    }
+    let settings = getCurrentSettings();
+    let svg = d3.select('.map-svg');
+    svg.selectAll('path')
+        .transition()
+        .duration(750)
+        .attr('fill', getColorMapFunction(MapOptions.currentField, settings));
+    drawLegend(MapOptions.currentField, settings, svg);
 }
 
 function initializeMap() {
     initializeControls();
-    loadSettings(FieldDetails[MapOptions.currentField]);
-    MapOptions.disableAutoUpdates = false;
 
     d3.json('data/metadata.json', function (metadata) {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             drawMap(geojson);
-            drawLegend();
         });
     });
 }

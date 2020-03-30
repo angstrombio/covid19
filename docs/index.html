@@ -30,64 +30,15 @@
         <div class="container-fluid p-3 my-3 bg-white text-dark">
             <h2>Mapping COVID-19 in the U.S.</h2>
             <div class="p-3 ">General overview here.  Include intro, rationale, link to blog post, link to Angstrom site, etc.</div>
-
-            <div id="map-content"></div>
-                        <div id="map-options">
-                <div class="row">
-                    <div class="layer-selection-label form-check form-control-sm col-sm-3">
-                        <label class="form-check-label">
-                            <input type="radio" id="layer-cases_per_icu_bed" name="layer-selection" value="cases_per_icu_bed" class="form-check-input" selected>
-                            Cases per ICU Bed
-                        </label>
-                    </div>
-                    <div class="layer-legend col-sm-1" id="legend-cases_per_icu_bed"></div>
-                    <div class="col-sm-8"></div>
-                </div>
-                <div class="row">
-                    <div class="layer-selection-label form-check form-control-sm col-sm-3">
-                        <label class="form-check-label">
-                            <input type="radio" id="layer-cases_per_10k_people" name="layer-selection" value="cases_per_10k_people" class="form-check-input">
-                            Cases per 10,000 People
-                        </label>
-                    </div>
-                    <div class="layer-legend col-sm-1" id="legend-cases_per_10k_people"></div>
-                </div>
-                <div class="row">
-                    <div class="layer-selection-label form-check form-control-sm col-sm-3">
-                        <label class="form-check-label">
-                            <input type="radio" id="layer-increase" name="layer-selection" value="increase" class="form-check-input">
-                            Increase in Cases Today
-                        </label>
-                    </div>
-                    <div class="layer-legend col-sm-1" id="legend-increase"></div>
-                </div>
-                <div class="row">
-                    <div class="layer-selection-label form-check form-control-sm col-sm-3">
-                        <label class="form-check-label">
-                            <input type="radio" id="layer-deaths" name="layer-selection" value="deaths" class="form-check-input">
-                            Deaths
-                        </label>
-                    </div>
-                    <div class="layer-legend col-sm-1" id="legend-deaths"></div>
-                </div>
-                <div class="row">
-                    <div class="layer-selection-label form-check form-control-sm col-sm-3">
-                        <label class="form-check-label">
-                            <input type="radio" id="layer-population" name="layer-selection" value="population" class="form-check-input">Population
-                        </label>
-                    </div>
-                    <div class="layer-legend col-sm-1" id="legend-population"></div>
-                </div>
-                <div class="row">
-                    <div class="layer-selection-label form-check form-control-sm col-sm-3">
-                        <label class="form-check-label">
-                            <input type="radio" id="layer-cases" name="layer-selection" value="cases" class="form-check-input">
-                            Cases
-                        </label>
-                    </div>
-                    <div class="layer-legend col-sm-1" id="legend-cases"></div>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" area-haspopup="true" area-expanded="false" id="field-selector-dropdown">
+                    Cases per ICU Bed
+                </button>
+                <div class="dropdown-menu" aria-labelledby="field-selector-dropdown" id="field-selector-options">
                 </div>
             </div>
+            <div id="map-content"></div>
+            
             <div class="row">
                 <div class="col-sm-1">
                     <label for="history-range">Timeline: </label>
@@ -170,6 +121,15 @@
 
         </footer>
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="map.js"></script>

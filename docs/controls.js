@@ -1,17 +1,24 @@
 
 function initializeControls() {
-    var fieldSelector = d3
-        .selectAll(".layer-selection-label")
-        .selectAll('input')
-        .on('change', function(d) {
-            const selection = this.value;
-            Map.disableAutoUpdates = true;
-            let newField = this.value;
-            loadSettings(FieldDetails[newField]);
-            MapOptions.currentField = newField;
-            MapOptions.disableAutoUpdates = false;
-            updateMap();
+
+    d3.selectAll('.field-selector-item')
+        .on('click', function() {
+            alert(this.id);
         });
+
+    d3.select('#field-selector-options')
+        .selectAll('a')
+        .data(MapOptions.fieldOptions)
+        .enter()
+        .append('a')
+        .classed('dropdown-item', true)
+        .classed('field-selector-item', true)
+        .attr('id', function(d) { return 'field-selector-' + d; })
+        .text(function(d) { return FieldDetails[d].label })
+        .on('click', function() {
+            fieldSelected(this.id.substring('field-selector-'.length));
+        });
+
     d3.select("#history-range")
         .on('change', function() {
             updateTimelineLabel();
@@ -19,11 +26,16 @@ function initializeControls() {
         });
 }
 
+function fieldSelected(field) {
+    let settings = FieldDetails[field];
+    if (settings != null) {
+    // Update the dropdown button
+        $('#field-selector-dropdown').text(settings.label);
+        MapOptions.currentField = field;
+        updateMap();
+    }
+}
+
 function getCurrentSettings() {
     return FieldDetails[MapOptions.currentField];
 }
-
-function loadSettings(settings) {
-    d3.select("#scheme-" + settings.colorScheme).property('selected', true);
-}
-
