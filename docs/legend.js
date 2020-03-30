@@ -1,27 +1,31 @@
-function drawLegend(currentSettings) {
-    if (currentSettings.colorScheme.startsWith('David')) {
-        d3.select("#legend").select('svg').select('rect').remove();
-        return;
-    }
-    let interpolator = getColorInterpolator(currentSettings);
-    var width = 200;
-    var height = 15;
-    var svg = d3.select("#legend").select('svg');
+function drawLegend() {
+    MapOptions.fieldOptions.forEach(function (field) {
+        drawLegendForField(field);
+    });
+}
+
+function drawLegendForField(field) {
+    settings = FieldDetails[field];
+    let interpolator = getColorInterpolator(settings);
+    var width = 150;
+    var height = 10;
+    var svg = d3.select("#legend-" + field).select('svg');
     if (svg.empty()) {
-        svg = d3.select("#legend").append('svg')
+        svg = d3.select("#legend-" + field).append('svg')
             .attr('width', width + 25)
-            .attr('height', height + 50);
+            .attr('height', height + 10);
     }
 
-    let colorMin = currentSettings.min;
-    let colorMax = currentSettings.max;
-    let rangeMin = Math.min(currentSettings.dataMin, colorMin);
-    let rangeMax = Math.max(currentSettings.dataMax, colorMax);
+    let colorMin = 0;
+    let rangeMin = 0;
+    let colorMax = settings.dataMax;
+    let rangeMax = colorMax;
 
     let logFunction = null;
-    if (currentSettings.logScaleColors != null && currentSettings.logScaleColors !== 'linear') {
-        logFunction = Math[currentSettings.logScaleColors];
-        colorMin = (colorMin <= 0 ? 0 : logFunction(colorMin));
+    if (settings.logScaleColors) {
+        logFunction = function(v) {
+            return Math.log(v+1);
+        };
         colorMax = logFunction(colorMax);
     }
 

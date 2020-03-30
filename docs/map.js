@@ -1,13 +1,13 @@
 MapOptions = {
-    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow','David-1', 'David-2', 'David-3', 'David-4'],
-    fieldOptions: ['cases', 'deaths', 'increase', 'population', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed', 'cases_fit'],
-    tooltipFields: ['cases', 'deaths', 'increase', 'population', 'hospitals', 'hospital_beds', 'icu_beds', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed', 'cases_fit'],
+    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
+    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'deaths', 'population', 'cases' ],
+    tooltipFields: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'deaths', 'population', 'cases', 'hospitals', 'hospital_beds', 'cases_per_bed','icu_beds' ],
 
     targetWidth: 1000,
     targetHeight: 600,
 
     includeCounties: true,
-    currentField: "cases",
+    currentField: "cases_per_icu_bed",
     disableAutoUpdates: true,
     lastUpdateDate: null,
     dateHistory: [],
@@ -16,17 +16,16 @@ MapOptions = {
 
 };
 FieldDetails = {
-    cases: {label: "Cases", colorScheme: "Blues", min: 0, max: 2500, format: ',d'},
-    deaths: {label: "Deaths", colorScheme: "Reds", min: 0, max: 500, format: ',d'},
-    increase: {label: "Increase in Cases Today", colorScheme: "Reds", min: 0, max: 1000, format: ',d'},
-    population: {label: "Population", colorScheme: "Blues", min: 0, max: 1000000, format: ',d'},
-    cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Reds", min: 0, max: 15, format: '.2f'},
-    cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", min: 0, max: 2, format: '.2f'},
-    cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", min: 0, max: 5, format: '.2f'},
-    hospitals: {label: "# of Hospitals", format: ',d'},
-    hospital_beds: {label: "# of Hospital Beds", format: ',d'},
-    icu_beds: {label: "# of ICU Beds", format: ',d'},
-    cases_fit: {label: "Cases - Fit", colorScheme: "Reds", min: 0, max: 1}
+    cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true},
+    deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
+    increase: {label: "Increase in Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true},
+    population: {label: "Population", colorScheme: "Greens", format: ',d', logScaleColors: true},
+    cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Oranges", format: '.2f', logScaleColors: true},
+    cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
+    cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
+    hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true},
+    hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true},
+    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
 };
 
 function updateMetadata(metadata) {
@@ -96,7 +95,7 @@ function updateMap() {
             .transition()
             .duration(1000)
             .attr('fill', getColorMapFunction(MapOptions.currentField, settings));
-        drawLegend(settings);
+        drawLegend();
     }
 }
 
@@ -109,7 +108,7 @@ function initializeMap() {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             drawMap(geojson);
-            drawLegend(getCurrentSettings());
+            drawLegend();
         });
     });
 }

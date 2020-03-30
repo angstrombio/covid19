@@ -6,6 +6,7 @@ import json
 import numpy as np
 from fitutil import Fit
 
+
 def set_property(metadata, properties, title, value, round_digits=None):
     """ Helper method to set a property in the GeoJSON properties, skipping it if is null/empty """
     if value is not None and value != "":
@@ -41,21 +42,20 @@ def append_history(continuing, history, value, round_digits=None, date_format=No
 
     return False
 
+
 def load(areas_geojsonfile, mergecounties_geojsonfile, output_geojsonfile, output_metadata):
     """
         Loads our data into the appropriate GeoJSON file
 
     :param areas_geojsonfile:   Our input file
-    :param state_outlines_geojsonfile: Optional GeoJSON of state outlines to include
     :param mergecounties_geojsonfile: Optional GeoJSON of counties to include in combined mode
     :param output_geojsonfile: Output file
-    :param level: msa, counties, or combined
     """
     # Use defaults if not specified
     if areas_geojsonfile is None or areas_geojsonfile == "":
         areas_geojsonfile = "../data/msa-input.geojson"
-    if (mergecounties_geojsonfile is None or mergecounties_geojsonfile == ""):
-            mergecounties_geojsonfile = "../data/counties_input.geojson"
+    if mergecounties_geojsonfile is None or mergecounties_geojsonfile == "":
+        mergecounties_geojsonfile = "../data/counties_input.geojson"
 
     metadata = {
         "last_file_date": None,
@@ -93,9 +93,6 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
     Loads the census, case data, and healthcare data from the database into a GeoJSON file.  Since we have
     matching views at the MSA, county and combined level sin the database, this function can be used
     to load data at any of those levels, but we must pass in some information on how it will be used.
-
-    :param geojson_file:    The file to load
-    :param level:           Whether to load msa, county, or counties not in an msa
     """
     geo_features = pygeoj.load(filepath=geojson_file)
     output_features = pygeoj.new()
@@ -131,15 +128,14 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                 if result is not None:
                     # We are going to recreate the properties for each feature (metro area) in our GeoJSON file - we don't really want any
                     # of the original properties, and will instead fill in information we loaded from the DB
-                    feature.properties = {"id": area_id, "area": result[2], "area_type": result[3],
-                                          "population": result[4]}
+                    feature.properties = {"id": area_id, "area": result[2], "area_type": result[3]}
                     file_date = result[5].strftime('%Y-%m-%d')
                     if metadata['last_file_date'] is None or file_date > metadata['last_file_date']:
                         metadata['last_file_date'] = file_date
+
+                    set_property(metadata, feature.properties, "population", result[4])
                     cases_today = result[6]
-
                     set_property(metadata, feature.properties, "cases", cases_today)
-
 
                     set_property(metadata, feature.properties, "cases_per_10k_people", result[7], round_digits=2)
                     set_property(metadata, feature.properties, "deaths", result[8])
@@ -157,14 +153,10 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                     date_history = []
                     cases_history = []
                     deaths_history = []
-                    recovered_history = []
-                    active_history = []
                     cases_per_10k_people_history = []
                     cases_per_bed_history = []
                     cases_per_icu_bed_history = []
                     continue_deaths = True
-                    # continue_recovered = True
-                    # continue_active = True
                     continue_per_capita = True
                     continue_per_bed = True
                     continue_per_icu = True
@@ -180,8 +172,6 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                             num_days_with_cases += 1
                         continue_per_capita = append_history(continue_per_capita, cases_per_10k_people_history, result[7], round_digits=2)
                         continue_deaths = append_history(continue_deaths, deaths_history, result[8])
-                        # continue_recovered = append_history(continue_recovered, recovered_history, result[9])
-                        # continue_active = append_history(continue_active, active_history, result[10])
                         continue_per_bed = append_history(continue_per_bed, cases_per_bed_history, result[15], round_digits=2)
                         continue_per_icu = append_history(continue_per_icu, cases_per_icu_bed_history, result[16], round_digits=2)
 
@@ -193,8 +183,6 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                         feature.properties['cases_history'] = cases_history
                         feature.properties['cases_per_10k_people_history'] = cases_per_10k_people_history
                         feature.properties['deaths_history'] = deaths_history
-                        # feature.properties['recovered_history'] = recovered_history
-                        # feature.properties['active_history'] = active_history
                         feature.properties['cases_per_bed_history'] = cases_per_bed_history
                         feature.properties['cases_per_icu_bed_history'] = cases_per_icu_bed_history
 
