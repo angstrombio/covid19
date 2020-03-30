@@ -154,12 +154,12 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                     cases_history = []
                     deaths_history = []
                     cases_per_10k_people_history = []
-                    cases_per_bed_history = []
                     cases_per_icu_bed_history = []
+                    increase_history = []
                     continue_deaths = True
                     continue_per_capita = True
-                    continue_per_bed = True
                     continue_per_icu = True
+                    continue_increase = True
 
                     num_days_with_cases = 0
 
@@ -172,7 +172,7 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                             num_days_with_cases += 1
                         continue_per_capita = append_history(continue_per_capita, cases_per_10k_people_history, result[7], round_digits=2)
                         continue_deaths = append_history(continue_deaths, deaths_history, result[8])
-                        continue_per_bed = append_history(continue_per_bed, cases_per_bed_history, result[15], round_digits=2)
+                        continue_increase = append_history(continue_increase, increase_history, result[11])
                         continue_per_icu = append_history(continue_per_icu, cases_per_icu_bed_history, result[16], round_digits=2)
 
                     if has_history:
@@ -183,7 +183,7 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                         feature.properties['cases_history'] = cases_history
                         feature.properties['cases_per_10k_people_history'] = cases_per_10k_people_history
                         feature.properties['deaths_history'] = deaths_history
-                        feature.properties['cases_per_bed_history'] = cases_per_bed_history
+                        feature.properties['increase_history'] = increase_history
                         feature.properties['cases_per_icu_bed_history'] = cases_per_icu_bed_history
 
                         if num_days_with_cases > 2:
