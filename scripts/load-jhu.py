@@ -131,6 +131,12 @@ def parse_county_format(db, file_date, lines):
         for row in reader:
             print(str(count) + " / " + str(len(lines)), end='\r')
             fips = row[0]
+            # Sometimes fips is too short - because it wasn't
+            if len(fips) == 4:
+                print()
+                print("Fixing incorrect FIPS code")
+                fips = '0' + fips
+
             county = row[1]
             state = row[2]
             country = row[3]

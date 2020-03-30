@@ -3,8 +3,8 @@ MapOptions = {
     fieldOptions: ['cases', 'deaths', 'increase', 'population', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed', 'cases_fit'],
     tooltipFields: ['cases', 'deaths', 'increase', 'population', 'hospitals', 'hospital_beds', 'icu_beds', 'cases_per_10k_people', 'cases_per_bed', 'cases_per_icu_bed', 'cases_fit'],
 
-    targetWidth: 700,
-    targetHeight: 425,
+    targetWidth: 1000,
+    targetHeight: 600,
 
     includeCounties: true,
     currentField: "cases",
@@ -40,7 +40,7 @@ function updateMetadata(metadata) {
         }
     }
 
-    d3.select("#map-text").append('span').html('Last Updated: ' + MapOptions.last_update_date);
+    d3.select("#map-text").append('span').html('Last Updated: ' + MapOptions.lastUpdateDate);
     setTimelineRange(0, MapOptions.dateHistory.length);
 }
 
@@ -63,13 +63,14 @@ function drawMap(geojson) {
         .classed('svg-container', true)
         .append('svg')
         .attr('preserveAspectRatio', 'xMinYMin meet')
+        //.attr('preserveAspectRatio', 'mMidYMid meet')
         .attr('viewBox', '0 0 ' + MapOptions.targetWidth + ' ' + MapOptions.targetHeight)
         .classed('svg-content-responsive', true);
 
     var g = svg.append('g');
 
     var albersProjection = d3.geoAlbersUsa()
-        .scale(950)
+        .scale(1200)
         .translate([MapOptions.targetWidth/2, MapOptions.targetHeight/2]);
 
     var geoPath = d3.geoPath().projection(albersProjection);
@@ -104,9 +105,9 @@ function initializeMap() {
     loadSettings(FieldDetails[MapOptions.currentField]);
     MapOptions.disableAutoUpdates = false;
 
-    d3.json('data/2020-03-28-metadata.json', function (metadata) {
+    d3.json('data/metadata.json', function (metadata) {
         updateMetadata(metadata);
-        d3.json('data/2020-03-28-cases-healthcare-history.geojson', function (geojson) {
+        d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             drawMap(geojson);
             drawLegend(getCurrentSettings());
         });

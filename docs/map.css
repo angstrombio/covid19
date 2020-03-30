@@ -1,3 +1,7 @@
+body {
+    background-color: #343A40;
+}
+
 div.tooltip {
     position: absolute;
     text-align: center;
@@ -31,18 +35,16 @@ div.tooltip {
     display: inline-block;
     position: relative;
     width: 100%;
-    padding-bottom: 100%; /* aspect ratio */
+    /*padding-bottom: 100%; /* aspect ratio */
+    padding-bottom: 60%;
     vertical-align: top;
     overflow: hidden;
 }
 .svg-content-responsive {
     display: inline-block;
     position: absolute;
-    top: 10px;
+    top: 0; /* was 10px*/
     left: 0;
-}
-svg .rect {
-    fill: gold;
 }
 .legend-text {
     font-family: sans-serif;
