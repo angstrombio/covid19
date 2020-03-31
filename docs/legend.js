@@ -7,8 +7,8 @@ function drawLegend(field, settings, svg) {
     let interpolator = getColorInterpolator(settings);
     let width = 100;
     let height = 10;
-    let xOffset = 700;
-    let yOffset = 60;
+    let xOffset = 450;
+    let yOffset = 30;
 
     let colorMin = 0;
     let rangeMin = 0;
@@ -66,8 +66,9 @@ function drawLegend(field, settings, svg) {
     if (legendLabel.empty()) {
         legendLabel = svgLegendGroup.append('text')
             .classed('legend-label', true)
-            .attr('y', yOffset - 4)
-            .attr('x', xOffset + 2);
+            .attr('text-anchor', 'middle')
+            .attr('y', yOffset - 10)
+            .attr('x', xOffset + 50);
     }
 
     legendLabel.text(settings.label);

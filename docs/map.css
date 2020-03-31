@@ -58,7 +58,8 @@ div.tooltip {
 
 .legend-label {
     font-family: sans-serif;
-    font-size: 7pt;
+    font-size: 12pt;
+    text-align: center;
 }
 .play-button {
 
