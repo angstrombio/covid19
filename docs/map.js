@@ -1,7 +1,7 @@
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
-    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'deaths', 'population', 'cases' ],
-    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population'],
+    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'population', 'cases' ],
+    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population'],
 
     targetWidth: 1000,
     targetHeight: 600,
@@ -20,6 +20,7 @@ FieldDetails = {
     increase: {label: "New Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true},
     population: {label: "Population", colorScheme: "Greens", format: ',d', logScaleColors: true},
     cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Oranges", format: '.2f', logScaleColors: true},
+    increase_per_10k_people: {label: "New Cases per 10,000", colorScheme: "RdPu", format: '.2f', logScaleColors: true},
     cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
     cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
     hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true},

@@ -67,7 +67,8 @@ def load(areas_geojsonfile, mergecounties_geojsonfile, output_geojsonfile, outpu
         "cases_per_icu_bed": {"min": 0, "max": 0},
         "population": {"min": 999999, "max": 0},
         "cases_fit": {"min": 1, "max": 0},
-        "increase": {"min": 0, "max": 0}
+        "increase": {"min": 0, "max": 0},
+        "increase_per_10k_people": {"min": 0, "max": 0}
     }
 
     print("Exporting Metro Areas")
@@ -115,7 +116,7 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                             file_date, cases, cases_per_10k_people, deaths, recovered, active,
                             increase_yesterday,
                             num_hospitals, staffed_beds, icu_beds,  
-                            cases_per_staffed_bed, cases_per_icu_bed"""
+                            cases_per_staffed_bed, cases_per_icu_bed, increase_per_10k_people"""
 
                 if load_msa:
                     query = base_query + " FROM covid19.cases_and_healthcare_historical_by_msa WHERE cbsa=%s"
@@ -147,6 +148,7 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                     set_property(metadata, feature.properties, "icu_beds", result[14])
                     set_property(metadata, feature.properties, "cases_per_bed", result[15], round_digits=2)
                     set_property(metadata, feature.properties, "cases_per_icu_bed", result[16], round_digits=2)
+                    set_property(metadata, feature.properties, "increase_per_10k_people", result[17], round_digits=3)
 
                     history_rows = cursor.fetchall()
                     has_history = False
@@ -154,12 +156,14 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                     cases_history = []
                     deaths_history = []
                     cases_per_10k_people_history = []
+                    increase_per_10k_people_history = []
                     cases_per_icu_bed_history = []
                     increase_history = []
                     continue_deaths = True
                     continue_per_capita = True
                     continue_per_icu = True
                     continue_increase = True
+                    contineu_increase_per_capita = True
 
                     num_days_with_cases = 0
 
@@ -174,6 +178,7 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                         continue_deaths = append_history(continue_deaths, deaths_history, result[8])
                         continue_increase = append_history(continue_increase, increase_history, result[11])
                         continue_per_icu = append_history(continue_per_icu, cases_per_icu_bed_history, result[16], round_digits=2)
+                        contineu_increase_per_capita = append_history(contineu_increase_per_capita, increase_per_10k_people_history, result[17], round_digits=3)
 
                     if has_history:
                         if metadata['file_date_history'] is None or len(metadata['file_date_history']) < len(date_history):
@@ -185,6 +190,7 @@ def load_data_into_geo(metadata, geojson_file, load_msa):
                         feature.properties['deaths_history'] = deaths_history
                         feature.properties['increase_history'] = increase_history
                         feature.properties['cases_per_icu_bed_history'] = cases_per_icu_bed_history
+                        feature.properties['increase_per_10k_people_history'] = increase_per_10k_people_history
 
                         if num_days_with_cases > 2:
                             nlen = len(cases_history) + 1
