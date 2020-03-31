@@ -17,7 +17,7 @@ MapOptions = {
 FieldDetails = {
     cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true},
     deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
-    increase: {label: "Increase in Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true},
+    increase: {label: "New Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true},
     population: {label: "Population", colorScheme: "Greens", format: ',d', logScaleColors: true},
     cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Oranges", format: '.2f', logScaleColors: true},
     cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
