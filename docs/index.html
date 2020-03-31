@@ -14,8 +14,8 @@
 </head>
 <body>
     <a name="map"></a>
-    <div class="container-fluid bg-dark text-white">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark justify-content-center sticky-top mx-3 py-0">
+    <div class="container-fluid bg-dark text-white px-0">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark justify-content-center sticky-top mx-0 py-0 px-3">
             <a class="navbar-brand d-flex w-50 mr-auto" href="https://www.angstrom.bio"><img height='50' width="109"  src='http://www-dev.angstrom.bio/wp-content/uploads/2020/03/angstrom_web2_for_site_340_156_white.png' alt='Angstrom Bio' title='' /></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
                 <span class="navbar-dark navbar-toggler-icon"></span>
@@ -31,11 +31,11 @@
             </div>
 
         </nav>
-        <div class="container p-3 my-1 bg-white text-dark">
+        <div class="container p-3 bg-white text-dark">
             <div class="container-fluid">
                 <div class="row align-items-center">
-                    <div class="col-sm-9" class="align-items-center"><h3>Mapping Localized COVID-19 Risk in the U.S.</h3></div>
-                    <div class="col-sm-3" class="align-items-center">
+                    <div class="col-sm-9 align-items-center text-heading"><h3>Mapping Localized COVID-19 Risk in the U.S.</h3></div>
+                    <div class="col-sm-3 align-items-center">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" area-haspopup="true" area-expanded="false" id="field-selector-dropdown">
                             Cases per ICU Bed
                         </button>
@@ -65,38 +65,163 @@
                     <div class="col-sm"></div>
                 </div>
             </div>
-            <div class="container-fluid">
-                <a name="overview"></a>
-                <h4>Overview</h4>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            <div class="container-fluid py-4">
+                <h3 class="text-heading">About the Map</h3>
+                <div class="py-2 text-content">
+                    <p>SARS-CoV-2 possesses a combination of infectiousness and virulence that has overwhelmed unprepared
+                    healthcare systems worldwide.  Reports from Wuhan, China, Iran, Lombardy, Italy, and now from New
+                    York City and other regions of the United States indicate that an inability to control the spread
+                    of the disease in the early weeks of a localized outbreak can lead to a flood of patients who
+                    require intensive care for acute respiratory distress or otherwise life-threatening symptoms.
+                    This flood can overwhelm local and regional healthcare system capacity with frightening speed,
+                    and can send mortality rates soaring.</p>
+                    <p>asdf</p>
+                    <p>asdf</p>
+                    <p>We have been inspired and humbled by the response to the outbreak, and we produced this resource to
+                    address both our own needs for COVID-19 planning, and also in the hope that it can help as many people
+                    as possible contextualize, plan, and respond to COVID-19.</p>
+                    <p>We would love any feedback you may have - be it questions, comments, requests for analysis, or even
+                    complaints. Whatever the context or content, please do not hesitate to reach out to us. And in the
+                    meantime, we hope you and yours remain as unscathed as possible by this outbreak, and that life
+                    returns to a healthy normal, soon.  </p>
+
+                    <footer class="blockquote-footer"><a href="https://www.angstrom.bio">The Angstrom Bio Team</a></footer>
+                </div>
             </div>
-            <div class="container-fluid">
-                <a name="definitions"></a>
-                <h4>Definitions</h4>
-                Vitae tempus quam pellentesque nec nam aliquam. Odio ut sem nulla pharetra diam sit amet. Euismod elementum nisi quis eleifend. Maecenas sed enim ut sem viverra aliquet eget. Mi bibendum neque egestas congue quisque. Natoque penatibus et magnis dis parturient montes nascetur ridiculus. Hendrerit gravida rutrum quisque non tellus orci ac auctor augue. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor sit. Euismod lacinia at quis risus sed vulputate odio. Cras pulvinar mattis nunc sed. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Felis eget velit aliquet sagittis id consectetur purus. Gravida in fermentum et sollicitudin. Pulvinar etiam non quam lacus suspendisse faucibus interdum posuere. Mattis enim ut tellus elementum sagittis. Bibendum arcu vitae elementum curabitur vitae nunc. Amet est placerat in egestas erat imperdiet. Sagittis orci a scelerisque purus semper eget duis. Libero enim sed faucibus turpis in eu.
-            </div>
-            <div class="container-fluid">
-                <a name="sources"></a>
-                <h4>Sources</h4>
-                These maps have been created utilizing datasets from:
-                <ul>
-                    <li>Johns Hopkins University (Last Data Update: <span id="map-text">)</span></li>
-                    <li>etc.</li>
-                    <li>etc.</li>
-                </ul>
+            <div class="container-fluid py-4">
+                <h3 class="text-heading">Reading the Map</h3>
+                <div class="py-2 text-content">
+                    <h5 class="text-sub-heading">LOCAL REGIONS</h5>
+                    <p>Data on the map is presented by census statistical regions (Metropolitan Statistical Area or
+                        Micropolital Statistical Area) (MSA), as defined below.  We have aggregated county-level data from within
+                        these regions as we believe it best represents the true picture and risk associated with each
+                        region.  For portions of the U.S. not covered by an MSA, we present county-level data.
+                    Currently, we are presenting:</p>
+                    <h5 class="text-sub-heading">LAYERS</h5>
+                    <p>The map presents color-coded data in a number of layers, controlled via the selector at the upper right.
+                    Currently, we are presenting:</p>
+                    <ul>
+                        <li>
+                            <span class="font-weight-bold">Cases per ICU Bed: </span>
+                            The total number of cases in a region divided by the Number of ICU Beds in that region (defined below).
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Cases per 10,000 People: </span>
+                            The total number of cases in a region compared to the 2018 U.S. Census population estimates for that
+                            region.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">New Cases: </span>
+                            The number of new cases in a region from the latest daily update to this data.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Deaths: </span>
+                            Total number of deaths from COVID-19 as reported by local and state departments of health.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Population: </span>
+                            The 2018 census estimates of population for a region.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Cases: </span>
+                            Cumulative number of cases in a given region
+                        </li>
+                    </ul>
+                    <p>Additional information on each region is displayed when clicking on or moving over a region.</p>
+                </div>
+                <div class="py-2 text-content">
+                    <h5 class="text-sub-heading">DATA</h5>
+                    <p>Data has been retrieved from the public sources noted below.  We claim no ownership of the source
+                    data.  We have completed various data analysis and transformations to present these maps.  All
+                    of the data, analysis, and data transformation code can be found in our GitHub repository.  You
+                    are free to copy, download, fork, or to otherwise use any of our work for your own purposes
+                    (with attribution - particulary to our sources).  We will be maintaining and adding data to the map
+                    for as long as the outbreak is active.</p>
+                </div>
+                <div class="py-2 text-content">
+                    <h5 class="text-sub-heading">SOURCES</h5>
+                    We have retrieved source data from the following sources:
+                    <ul>
+                        <li>
+                            <span class="font-weight-bold">County and MSA Definitions and Metrics, and Population Estimates: </span>
+                            U.S. Census Bureau, 2018 Data
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Case and Mortality Counts: </span>
+                            Johns Hopkins Center for Systems Science and Engineering (CSSE).
+                            <i>(Last Update: <span id="map-text"></span>)</i>
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Hospital Capacity Data:</span>
+                            Definitive Healthcare (primary), the Harvard Global Health Institute, and the United States Centers for medicare & Medicaid Services
+                        </li>
+                    </ul>
+                </div>
+                <div class="py-2 text-content">
+                    <h5 class="text-sub-heading">DEFINITIONS</h5>
+                    <p>In addition to the data layers defined above, the following terms are used throughout our analysis
+                        and data presentation:</p>
+
+                    <ul>
+                        <li>
+                            <span class="font-weight-bold">Metropolitan Statistical Area: </span>
+                            One of 542 statistical regions in the United States generally defined as having more than 50,000 residents.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Micropolital Statistical Area: </span>
+                            One of 384 statistical regions in the United States generally defined as having more than 10,000 residents but less than 50,000 residents.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Number of Hospitals: </span>
+                            Total number of healthcare institutions in a given region that provide inpatient, therapeutic, or rehabilitation services, under the supervision of physicians.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Number of Hospital Beds: </span>
+                            The sum of the hospital-reported "adult, pediatric, birthing room, or newborn ICU beds (excluding newborn bassinets) maintained in a patient care area for lodging patients in acute, long term, or domiciliary areas of a given hospital" in a given region.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Number of ICU Beds:</span>
+                            The sum of the beds in a given region that fit the definition set forth in CMS, Section 2202.7, 22-8.2.
+                        </li>
+                    </ul>
+                </div>
+                <h3 class="text-heading">Other Info</h3>
+                <div class="py-2 text-content">
+                    <h5 class="text-sub-heading">TEAM</h5>
+                    <p>Analysis and mapping work was completed by the <a href="https://www.angstrom.bio">Angstrom Bio Team</a>.
+                    <p>Data Analysis and Map Construction: Jonathan (JP) Feldmann</p>
+                    <p>Analytical Methods: Carlos Santos, Ph.D. and David States, M.D., Ph.D.</p>
+                    <p>Map Proejct Conceptualization & Design: Forrest Cox</p>
+
+                    <h5 class="text-sub-heading">ACKNOWLEDGEMENTS</h5>
+                    <p>
+                        We are extremely grateful for the incredible, open work conducted by Johns Hopkins CSSU, the
+                        Harvard Institute for Global Health, Definitive Data, and others during this outbreak.
+                    </p>
+                    <p>
+                        We are also thankful for the widespread culture of openness, collaboration, and of academic
+                        and analytical rigor that makes projects like this possible.
+                    </p>
+
+                    <h5 class="text-sub-heading">ABOUT ANGSTROM</h5>
+                    <p>
+                        Angstrom Bio, Inc. applies novel nucleotide chemistry and machine intelligence to the study,
+                        diagnosis, and treatment of disease. Our core technology is a machine learning-driven platform
+                        for the computational optimization of antibodies and of antibody-like proteins. We seek to
+                        develop ever deeper models of understanding of the dynamics that govern protein-protein
+                        interactions, and to enable the true rational design of the right molecules for a given use case.
+                        For more information about us and what we do, please use the contact form below, or send us an
+                        email at <a href="mailto:info@angstrom.bio">info@angstrom.bio</a>.
+                    </p>
+                </div>
             </div>
             <div class="tooltip" id="tooltip">
                 <div class="tooltip-header"></div>
                 <table class="tooltip-table">
                     <tr>
-                        <td class="tooltip-label-cell">Cases per ICU Bed: </td>
-                        <td class="tooltip-value-cell" id="tooltip-value-cases_per_icu_bed"></td>
-                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases_per_icu_bed"></div></td>
-                    </tr>
-                    <tr>
-                        <td class="tooltip-label-cell">Cases per 10,000 People: </td>
-                        <td class="tooltip-value-cell" id="tooltip-value-cases_per_10k_people"></td>
-                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases_per_10k_people"></div></td>
+                        <td class="tooltip-label-cell">Cases: </td>
+                        <td class="tooltip-value-cell" id="tooltip-value-cases"></td>
+                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases"></div></td>
                     </tr>
                     <tr>
                         <td class="tooltip-label-cell">New Cases Today: </td>
@@ -104,19 +229,23 @@
                         <td><div class="tooltip-color-cell" id="tooltip-colorblock-increase"></div></td>
                     </tr>
                     <tr>
+                        <td class="tooltip-label-cell">Cases per 10,000 People: </td>
+                        <td class="tooltip-value-cell" id="tooltip-value-cases_per_10k_people"></td>
+                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases_per_10k_people"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="tooltip-label-cell">Cases per ICU Bed: </td>
+                        <td class="tooltip-value-cell" id="tooltip-value-cases_per_icu_bed"></td>
+                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases_per_icu_bed"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="tooltip-label-cell">Cases per Hospital Bed: </td>
+                        <td class="tooltip-value-cell" id="tooltip-value-cases_per_bed"></td>
+                    </tr>
+                    <tr>
                         <td class="tooltip-label-cell">Deaths: </td>
                         <td class="tooltip-value-cell" id="tooltip-value-deaths"></td>
                         <td><div class="tooltip-color-cell" id="tooltip-colorblock-deaths"></div></td>
-                    </tr>
-                    <tr>
-                        <td class="tooltip-label-cell">Population: </td>
-                        <td class="tooltip-value-cell" id="tooltip-value-population"></td>
-                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-population"></div></td>
-                    </tr>
-                    <tr>
-                        <td class="tooltip-label-cell">Cases: </td>
-                        <td class="tooltip-value-cell" id="tooltip-value-cases"></td>
-                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases"></div></td>
                     </tr>
                     <tr>
                         <td class="tooltip-label-cell">Hospitals: </td>
@@ -131,8 +260,9 @@
                         <td class="tooltip-value-cell" id="tooltip-value-icu_beds"></td>
                     </tr>
                     <tr>
-                        <td class="tooltip-label-cell">Cases per Hospital Bed: </td>
-                        <td class="tooltip-value-cell" id="tooltip-value-cases_per_bed"></td>
+                        <td class="tooltip-label-cell">Population: </td>
+                        <td class="tooltip-value-cell" id="tooltip-value-population"></td>
+                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-population"></div></td>
                     </tr>
                 </table>
             </div>

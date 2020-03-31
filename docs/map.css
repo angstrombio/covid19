@@ -17,6 +17,20 @@ div.tooltip {
 .tooltip-table {
 
 }
+.navbar {
+    background-image: url("img/coronavirus-wide.png");
+    background-size: cover;
+}
+.text-heading {
+    color: #4D0000;
+}
+.text-content {
+    font-size: 12pt;
+}
+
+.text-sub-heading {
+    color: rgb(100, 100, 100);
+}
 .tooltip-header {
     font: 15px sans-serif;
     font-weight: bold;

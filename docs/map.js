@@ -1,7 +1,7 @@
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
     fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'deaths', 'population', 'cases' ],
-    tooltipFields: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'deaths', 'population', 'cases', 'hospitals', 'hospital_beds', 'cases_per_bed','icu_beds' ],
+    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population'],
 
     targetWidth: 1000,
     targetHeight: 600,
@@ -38,7 +38,7 @@ function updateMetadata(metadata) {
         }
     }
 
-    d3.select("#map-text").append('span').html('Last Updated: ' + MapOptions.lastUpdateDate);
+    d3.select("#map-text").append('span').html(MapOptions.lastUpdateDate);
     setTimelineRange(0, MapOptions.dateHistory.length);
 }
 
