@@ -1,0 +1,10 @@
+cycler==0.10.0
+kiwisolver==1.1.0
+matplotlib==3.2.1
+numpy==1.18.2
+psycopg2==2.8.4
+PyGeoj==1.0.0
+pyparsing==2.4.6
+pyshp==2.1.0
+python-dateutil==2.8.1
+six==1.14.0
