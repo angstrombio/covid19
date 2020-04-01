@@ -1,12 +1,7 @@
 
 function initializeControls() {
 
-    d3.selectAll('.field-selector-item')
-        .on('click', function() {
-            alert(this.id);
-        });
-
-    d3.select('#field-selector-options')
+    /*d3.select('#field-selector-options')
         .selectAll('a')
         .data(MapOptions.fieldOptions)
         .enter()
@@ -17,7 +12,7 @@ function initializeControls() {
         .text(function(d) { return FieldDetails[d].label })
         .on('click', function() {
             fieldSelected(this.id.substring('field-selector-'.length));
-        });
+        });*/
 
     d3.select("#history-range")
         .on('change', function() {
