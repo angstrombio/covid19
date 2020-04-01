@@ -25,7 +25,13 @@ function fieldSelected(field) {
     let settings = FieldDetails[field];
     if (settings != null) {
     // Update the dropdown button
-        $('#field-selector-dropdown').text(settings.label);
+        //$('#field-selector-dropdown').text(settings.label);
+        d3.select('#field-button-' + MapOptions.currentField)
+            .classed("btn-primary", false)
+            .classed("btn-secondary", true);
+        d3.select('#field-button-' + field)
+            .classed("btn-primary", true)
+            .classed("btn-secondary", false);
         MapOptions.currentField = field;
         updateMap();
     }

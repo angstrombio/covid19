@@ -72,4 +72,13 @@ function drawLegend(field, settings, svg) {
     }
 
     legendLabel.text(settings.label);
+
+    let instructionsLabel = svg.selectAll('.instructions-label');
+    if (instructionsLabel.empty()) {
+        svg.append('text')
+            .classed('instructions-label', true)
+            .attr('x', 700)
+            .attr('y',30)
+            .text('Hover or click on regions to see detailed data')
+    }
 }
