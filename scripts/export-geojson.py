@@ -29,13 +29,13 @@ def load(areas_geojsonfile, state_outlines_geojsonfile, mergecounties_geojsonfil
     if areas_geojsonfile is None or areas_geojsonfile == "":
         # Use defaults
         if level == 'msa':
-            areas_geojsonfile = "../data/msa-input.geojson"
+            areas_geojsonfile = "../input-data/msa-input.geojson"
         elif level == 'counties':
-            areas_geojsonfile = "../data/counties_input.geojson"
+            areas_geojsonfile = "../input-data/counties_input.geojson"
         elif level == 'combined':
-            areas_geojsonfile = "../data/msa-input.geojson"
+            areas_geojsonfile = "../input-data/msa-input.geojson"
             if (mergecounties_geojsonfile is None or mergecounties_geojsonfile == ""):
-                mergecounties_geojsonfile = "../data/counties_input.geojson"
+                mergecounties_geojsonfile = "../input-data/counties_input.geojson"
 
     if level == 'combined':
         print("Exporting Metro Areas")

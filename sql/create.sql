@@ -149,8 +149,6 @@ create view covid19.healthcare_msa as
     left outer join (select objectid, bed_utilization*num_licensed_beds as utilized_beds, num_licensed_beds as beds_to_combine from covid19.def_healthcare_data where bed_utilization is not null) as calc on src.objectid=calc.objectid
     group by msa.cbsa, msa.msa_name;
 
-
--- NEW MSA:
 create view covid19.cases_and_healthcare_historical_by_msa as (
     select msa.cbsa as cbsa,
         null as fips,
@@ -169,9 +167,9 @@ create view covid19.cases_and_healthcare_historical_by_msa as (
         hc.staffed_beds,
         hc.icu_beds,
         hc.combined_bed_utilization,
-        case when hc.licensed_beds is null or hc.licensed_beds=0 then null else sum(cases.cases::float)/hc.licensed_beds end as cases_per_licensed_bed,
-        case when hc.staffed_beds is null or hc.staffed_beds=0 then null else sum(cases.cases::float)/hc.staffed_beds end as cases_per_staffed_bed,
-        case when hc.icu_beds is null or hc.icu_beds=0 then null else sum(cases.cases::float)/hc.icu_beds end as cases_per_icu_bed,
+        case when hc.licensed_beds is null or hc.licensed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.licensed_beds end as cases_per_licensed_bed,
+        case when hc.staffed_beds is null or hc.staffed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.staffed_beds end as cases_per_staffed_bed,
+        case when hc.icu_beds is null or hc.icu_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.icu_beds end as cases_per_icu_bed,
         case when msa.pop_2018 is null then null else sum(cases_delta)::float/msa.pop_2018*10000 end as increase_per_10k_people
     from covid19.census_msa msa
         inner join covid19.census_msa_counties mc on msa.cbsa=mc.cbsa
@@ -199,9 +197,9 @@ create view covid19.cases_and_healthcare_historical_by_county as (
         hc.staffed_beds,
         hc.icu_beds,
         hc.combined_bed_utilization,
-        case when hc.licensed_beds is null or hc.licensed_beds=0 then null else sum(cases.cases::float)/hc.licensed_beds end as cases_per_licensed_bed,
-        case when hc.staffed_beds is null or hc.staffed_beds=0 then null else sum(cases.cases::float)/hc.staffed_beds end as cases_per_staffed_bed,
-        case when hc.icu_beds is null or hc.icu_beds=0 then null else sum(cases.cases::float)/hc.icu_beds end as cases_per_icu_bed,
+        case when hc.licensed_beds is null or hc.licensed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.licensed_beds end as cases_per_licensed_bed,
+        case when hc.staffed_beds is null or hc.staffed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.staffed_beds end as cases_per_staffed_bed,
+        case when hc.icu_beds is null or hc.icu_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.icu_beds end as cases_per_icu_bed,
         case when counties.pop_2018 is null then null else sum(cases_delta)::float/counties.pop_2018*10000 end as increase_per_10k_people
     from covid19.census counties
         inner join covid19.states states on counties.state=states.state_name

@@ -53,9 +53,9 @@ def load(areas_geojsonfile, mergecounties_geojsonfile, output_geojsonfile, outpu
     """
     # Use defaults if not specified
     if areas_geojsonfile is None or areas_geojsonfile == "":
-        areas_geojsonfile = "../data/msa-input.geojson"
+        areas_geojsonfile = "../input-data/msa-input.geojson"
     if mergecounties_geojsonfile is None or mergecounties_geojsonfile == "":
-        mergecounties_geojsonfile = "../data/counties_input.geojson"
+        mergecounties_geojsonfile = "../input-data/counties_input.geojson"
 
     metadata = {
         "last_file_date": None,
