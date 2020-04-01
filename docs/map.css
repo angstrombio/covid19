@@ -17,6 +17,9 @@ div.tooltip {
 .tooltip-table {
 
 }
+.website-link {
+    color:#ffffff !important;
+}
 .navbar {
     background-image: url("img/coronavirus-wide.png");
     background-size: cover;
