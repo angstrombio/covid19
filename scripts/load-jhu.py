@@ -3,6 +3,7 @@ import os
 import csv
 import psycopg2
 import coronadb
+from jhudata import OVERRIDES
 
 
 def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_existing):
@@ -131,15 +132,33 @@ def parse_county_format(db, file_date, lines):
         for row in reader:
             print(str(count) + " / " + str(len(lines)), end='\r')
             fips = row[0]
-            # Sometimes fips is too short - because it wasn't
-            if len(fips) == 4:
-                print()
-                print("Fixing incorrect FIPS code")
-                fips = '0' + fips
-
             county = row[1]
             state = row[2]
             country = row[3]
+            if country == 'US':
+                if fips is None or fips == '':
+                    if state in OVERRIDES:
+                        state_overrides = OVERRIDES[state]
+                        if county in state_overrides:
+                            new_fips = state_overrides[county]
+                            if new_fips is None or new_fips == '':
+                                print()
+                                print("Found override for county, but FIPS is still empty: " + state + "." + county)
+                            else:
+                                fips = new_fips
+                        else:
+                            print()
+                            print("NO MATCHING FIPS: " + state + "." + county)
+                    else:
+                        print()
+                        print("NO MATCHING FIPS: " + state + "." + county)
+
+                elif len(fips) == 4:
+                    # Sometimes fips is too short - because it wasn't
+                    print()
+                    print("Fixing incorrect FIPS code")
+                    fips = '0' + fips
+
             last_update = row[4]
             lat = row[5]
             long = row[6]
