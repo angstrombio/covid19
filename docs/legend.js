@@ -11,6 +11,9 @@ function drawLegend(field, settings, svg) {
     let yOffset = 30;
 
     let colorMin = 0;
+    if (settings["forceColorMin"] != null) {
+        colorMin = settings.forceColorMin;
+    }
     let rangeMin = 0;
     let colorMax = settings.dataMax;
     let rangeMax = colorMax;
@@ -20,6 +23,9 @@ function drawLegend(field, settings, svg) {
         logFunction = function(v) {
             return Math.log(v+1);
         };
+        if (colorMin > 1) {
+            colorMin = logFunction(colorMin);
+        }
         colorMax = logFunction(colorMax);
     }
 

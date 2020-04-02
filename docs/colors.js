@@ -20,12 +20,17 @@ function getColorMapFunction(field, settings) {
             return "#ffffff";
         } else {
             let min = 0;
+            if (settings["forceColorMin"] != null) {
+                min = settings.forceColorMin;
+            }
             let max = settings.dataMax;
             if (logFunction != null) {
-                min = 0;
+                if (min > 1) {
+                    min = logFunction(min)
+                }
                 max = logFunction(max);
-                if (value <= 0) {
-                    value =0;
+                if (value <= min) {
+                    value = min;
                 } else {
                     value = logFunction(value);
                 }
