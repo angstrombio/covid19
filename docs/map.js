@@ -56,7 +56,7 @@ function getFieldValueForDisplay(d, field) {
     return d.properties[field];
 }
 
-function drawMap(geojson) {
+function drawMap(geojson, states) {
     var svg = d3.select('#map-content')
         .append('div')
         .classed('svg-container', true)
@@ -67,7 +67,8 @@ function drawMap(geojson) {
         .attr('viewBox', '0 0 ' + MapOptions.targetWidth + ' ' + MapOptions.targetHeight)
         .classed('svg-content-responsive', true);
 
-    var g = svg.append('g');
+    var g = svg.append('g')
+        .classed('map-areas', true);
 
     var albersProjection = d3.geoAlbersUsa()
         .scale(1200)
@@ -88,13 +89,24 @@ function drawMap(geojson) {
         .on("mouseover", getShowTooltipFunction(MapOptions, FieldDetails))
         .on("mouseout",  hideTooltipFunction);
 
+    var gs = svg.append('g')
+        .classed('map-states', true);
+    gs.selectAll('path')
+        .data(states.features)
+        .enter()
+        .append('path')
+        .attr('stroke','#000')
+        .attr('stroke-width', 0.1)
+        .attr('d', geoPath)
+        .attr('fill', 'none');
+
     drawLegend(MapOptions.currentField, settings, svg);
 }
 
 function updateMap() {
     let settings = getCurrentSettings();
     let svg = d3.select('.map-svg');
-    svg.selectAll('path')
+    svg.select('.map-areas').selectAll('path')
         .transition()
         .duration(750)
         .attr('fill', getColorMapFunction(MapOptions.currentField, settings));
@@ -107,7 +119,9 @@ function initializeMap() {
     d3.json('data/metadata.json', function (metadata) {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
-            drawMap(geojson);
+            d3.json('data/states.geojson', function(states) { // TODO JP deal with size of this file
+                drawMap(geojson, states);
+            });
         });
     });
 }
