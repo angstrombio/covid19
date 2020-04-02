@@ -150,7 +150,8 @@ create view covid19.healthcare_msa as
     group by msa.cbsa, msa.msa_name;
 
 create view covid19.cases_and_healthcare_historical_by_msa as (
-    select msa.cbsa as cbsa,
+    select CAST(msa.cbsa as VARCHAR) as GEOID,
+        msa.cbsa as cbsa,
         null as fips,
         msa.msa_name as area_name,
         msa.msa_type as area_type,
@@ -180,7 +181,8 @@ create view covid19.cases_and_healthcare_historical_by_msa as (
 );
 -- COUNTIES NEW:
 create view covid19.cases_and_healthcare_historical_by_county as (
-    select 0 as cbsa,
+    select counties.fips as GEOID,
+        0 as cbsa,
         counties.fips as fips,
         concat(counties.county, ', ', states.abbreviation) as area_name,
         'County' as area_type,
@@ -208,4 +210,9 @@ create view covid19.cases_and_healthcare_historical_by_county as (
     where counties.county_num <> 0
     group by counties.fips, counties.county, counties.state, states.abbreviation, counties.pop_2018, cases.file_date, hc.num_hospitals, hc.licensed_beds, hc.staffed_beds, hc.icu_beds, hc.combined_bed_utilization
     order by counties.fips, cases.file_date desc
+);
+create view covid19.cases_and_healthcare_historical_combined as (
+    select * from covid19.cases_and_healthcare_historical_by_msa
+    UNION ALL
+    select * from covid19.cases_and_healthcare_historical_by_county where fips not in (select fips_stcou from covid19.census_msa_counties)
 );
