@@ -25,7 +25,7 @@ FieldDetails = {
     cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
     hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true},
     hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true},
-    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
+    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true}
 };
 
 function updateMetadata(metadata) {

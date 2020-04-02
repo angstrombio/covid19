@@ -48,9 +48,10 @@ function hideTooltipFunction(d) {
 
 function addToolTipHTML(tooltip, feature, backgroundColor) {
     tooltip.select(".tooltip-header").html(feature.properties.area);
+    tooltip.select(".tooltip-sub-header").html(feature.properties.area_type);
 
     MapOptions.tooltipFields.forEach(function(field) {
-        value = getToolTipFieldValue(feature, field)
+        value = getToolTipFieldValue(feature, field);
         d3.select("#tooltip-value-" + field).html(value);
         d3.select("#tooltip-colorblock-" + field).style('background-color', getToolTipColorCell(feature, backgroundColor, field, value));
     });

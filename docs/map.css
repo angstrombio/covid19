@@ -6,7 +6,7 @@ div.tooltip {
     position: absolute;
     text-align: center;
     width: 250px;
-    height: 220px;
+    height: 250px;
     padding: 4px;
     font: 12px sans-serif;
     border: 0px;
@@ -37,8 +37,13 @@ div.tooltip {
 .tooltip-header {
     font: 15px sans-serif;
     font-weight: bold;
+    padding-bottom: 2px;
+}
+.tooltip-sub-header {
+    font: 12px sans-serif;
     padding-bottom: 5px;
 }
+
 .tooltip-label-cell {
     text-align: right;
     font-weight: bold;
