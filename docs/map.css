@@ -98,3 +98,10 @@ div.tooltip {
     font-size: 9pt;
     font-style: italic;
 }
+.slider::-webkit-slider-thumb {
+  background: #900;
+}
+
+.slider::-moz-range-thumb {
+  background: #900;
+}
