@@ -103,6 +103,12 @@ div.tooltip {
     font-size: 9pt;
     font-style: italic;
 }
+.loading-text {
+    font-family: sans-serif;
+    fill: #7f7f7f;
+    font-size: 10pt;
+    font-style: italic;
+}
 .slider::-webkit-slider-thumb {
   background: #900;
 }

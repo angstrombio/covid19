@@ -57,8 +57,8 @@ function getFieldValueForDisplay(d, field) {
     return d.properties[field];
 }
 
-function drawMap(geojson, states) {
-    var svg = d3.select('#map-content')
+function drawEmptyMapPlaceholder() {
+    let svg = d3.select('#map-content')
         .append('div')
         .classed('svg-container', true)
         .append('svg')
@@ -67,8 +67,20 @@ function drawMap(geojson, states) {
         .attr('viewBox', '0 0 ' + MapOptions.targetWidth + ' ' + MapOptions.targetHeight)
         .classed('svg-content-responsive', true);
 
+    svg.append('text')
+        .classed('loading-text', true)
+        .attr('x', 400)
+        .attr('y', 300)
+        .text('Loading Map Content...');
+
+    return svg;
+}
+
+function drawMap(svg, geojson, states) {
     var g = svg.append('g')
         .classed('map-areas', true);
+
+    svg.select('#loading-text').remove();
 
     var albersProjection = d3.geoAlbersUsa()
         .scale(1200)
@@ -115,12 +127,12 @@ function updateMap() {
 
 function initializeMap() {
     initializeControls();
-
+    let svg = drawEmptyMapPlaceholder();
     d3.json('data/metadata.json', function (metadata) {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             d3.json('data/states.geojson', function(states) { // TODO JP deal with size of this file
-                drawMap(geojson, states);
+                drawMap(svg, geojson, states);
             });
         });
     });
