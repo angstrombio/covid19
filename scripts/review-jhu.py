@@ -4,6 +4,7 @@ import psycopg2
 import coronadb
 from jhudata import OVERRIDES
 from jhudata import OVERRIDE_COUNTIES_WITH_DATA
+from jhudata import IGNORED_COUNTIES
 
 def review(source):
     with get_db_connection(coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password) as db:
@@ -114,7 +115,7 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
                     counties_matched += 1
                     found_counties.append(fips)
                 else:
-                    if fips not in ['XXXXX','88888','99999','66000']:
+                    if fips not in IGNORED_COUNTIES:
                         print("County details not found for FIPS=" + fips + ", " + state + " " + county)
 
     print("Counties Matched: " + str(counties_matched))
