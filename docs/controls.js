@@ -1,31 +1,33 @@
 
 function initializeControls() {
-
-    /*d3.select('#field-selector-options')
-        .selectAll('a')
-        .data(MapOptions.fieldOptions)
-        .enter()
-        .append('a')
-        .classed('dropdown-item', true)
-        .classed('field-selector-item', true)
-        .attr('id', function(d) { return 'field-selector-' + d; })
-        .text(function(d) { return FieldDetails[d].label })
-        .on('click', function() {
-            fieldSelected(this.id.substring('field-selector-'.length));
-        });*/
-
     d3.select("#history-range")
         .on('change', function() {
             updateTimelineLabel();
             updateMap();
         });
+
+    window.onpopstate = function(event) {
+        state = event.state;
+        if (state == null || state.field == null || FieldDetails[state.field] == null) {
+            fieldSelected('cases_per_icu_bed', false);
+        } else {
+            fieldSelected(state.field, false);
+        }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let field = urlParams.get('field');
+    if (FieldDetails[field] != null) {
+        fieldSelected(field, true, false);
+    }
 }
 
-function fieldSelected(field) {
+function fieldSelected(field, shouldChangeState = true, shouldUpdateMap = true) {
     let settings = FieldDetails[field];
     if (settings != null) {
-    // Update the dropdown button
-        //$('#field-selector-dropdown').text(settings.label);
+        if (shouldChangeState) {
+            window.history.pushState({field: field}, document.title, "?field=" + field);
+        }
         d3.select('#field-button-' + MapOptions.currentField)
             .classed("btn-primary", false)
             .classed("btn-secondary", true);
@@ -33,7 +35,9 @@ function fieldSelected(field) {
             .classed("btn-primary", true)
             .classed("btn-secondary", false);
         MapOptions.currentField = field;
-        updateMap();
+        if (shouldUpdateMap) {
+            updateMap();
+        }
     }
 }
 

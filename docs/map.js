@@ -1,19 +1,3 @@
-MapOptions = {
-    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
-    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'population', 'cases' ],
-    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling'],
-
-    targetWidth: 1000,
-    targetHeight: 600,
-
-    includeCounties: true,
-    currentField: "cases_per_icu_bed",
-    lastUpdateDate: null,
-    dateHistory: [],
-
-    historyIndex: -1,
-
-};
 FieldDetails = {
     cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true},
     deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
@@ -27,6 +11,22 @@ FieldDetails = {
     hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true},
     icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
     doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10 }
+};
+MapOptions = {
+    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
+    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'population', 'cases' ],
+    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling'],
+
+    targetWidth: 1000,
+    targetHeight: 600,
+
+    includeCounties: true,
+    currentField: 'cases_per_icu_bed',
+    lastUpdateDate: null,
+    dateHistory: [],
+
+    historyIndex: -1,
+
 };
 
 function updateMetadata(metadata) {
