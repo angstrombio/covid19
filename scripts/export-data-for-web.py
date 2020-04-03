@@ -4,7 +4,7 @@ import coronadb
 import argparse
 import json
 import os
-
+import math
 
 def set_property(metadata, properties, title, value, round_digits=None):
     """ Helper method to set a property in the GeoJSON properties, skipping it if is null/empty """
@@ -62,7 +62,8 @@ def load(areas_geojsonfile, output_folder, overwrite):
         "cases_per_icu_bed": {"min": 0, "max": 0},
         "population": {"min": 999999, "max": 0},
         "increase": {"min": 0, "max": 0},
-        "increase_per_10k_people": {"min": 0, "max": 0}
+        "increase_per_10k_people": {"min": 0, "max": 0},
+        "doubling": {"min": 0, "max": 0}
     }
 
     with psycopg2.connect(dbname=coronadb.database, port=coronadb.port, user=coronadb.user, host=coronadb.host,
@@ -192,6 +193,32 @@ def load_data_into_feature(db, metadata, feature, area_id):
                 feature.properties['increase_history'] = increase_history
                 feature.properties['cases_per_icu_bed_history'] = cases_per_icu_bed_history
                 feature.properties['increase_per_10k_people_history'] = increase_per_10k_people_history
+
+                # Calculate growth rate as # days the number is doubling over the last week
+                # growth rate = (log(cases) - log(cases 7 days ago)/log(2)  ---- # of doubling in the last week
+                # doubling = 7/growth rate (# of days to double)
+                # Like NYT, only calculate when we have 7 days of data and cases > 20
+                index_current = -1
+                index_1week = 6
+                continue_growth = True
+                growth_history = []
+                while continue_growth and len(cases_history) > index_1week:
+                    cases_current = (cases_today if index_current < 0 else cases_history[index_current])
+                    cases_1week = cases_history[index_1week]
+                    if cases_current < 20 or cases_1week == 0:
+                        continue_growth = False
+                    else:
+                        growth_rate_1wk = (math.log(cases_current) - math.log(cases_1week)) / math.log(2)
+                        doubling = 7 / growth_rate_1wk
+                        if index_current < 0:
+                            set_property(metadata, feature.properties, 'doubling', doubling, round_digits=1)
+                        else:
+                            continue_growth = append_history(continue_growth, growth_history, doubling, round_digits=1)
+
+                    index_current += 1
+                    index_1week += 1
+
+                feature.properties['doubling_history'] = growth_history
 
     return feature
 

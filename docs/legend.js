@@ -16,7 +16,10 @@ function drawLegend(field, settings, svg) {
     }
     let rangeMin = 0;
     let colorMax = settings.dataMax;
-    let rangeMax = colorMax;
+    if (settings['forceColorMax'] != null) {
+        colorMax = settings['forceColorMax']
+    }
+    let rangeMax = settings.dataMax;
 
     let logFunction = null;
     if (settings.logScaleColors) {

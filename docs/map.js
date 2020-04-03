@@ -1,7 +1,7 @@
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
     fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'population', 'cases' ],
-    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population'],
+    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling'],
 
     targetWidth: 1000,
     targetHeight: 600,
@@ -25,7 +25,8 @@ FieldDetails = {
     cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
     hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true},
     hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true},
-    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true}
+    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
+    doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10 }
 };
 
 function updateMetadata(metadata) {
@@ -63,7 +64,6 @@ function drawMap(geojson, states) {
         .append('svg')
         .classed("map-svg", true)
         .attr('preserveAspectRatio', 'xMinYMin meet')
-        //.attr('preserveAspectRatio', 'mMidYMid meet')
         .attr('viewBox', '0 0 ' + MapOptions.targetWidth + ' ' + MapOptions.targetHeight)
         .classed('svg-content-responsive', true);
 
