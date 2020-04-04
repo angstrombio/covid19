@@ -131,7 +131,7 @@ function initializeMap() {
     d3.json('data/metadata.json', function (metadata) {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
-            d3.json('data/states.geojson', function(states) { // TODO JP deal with size of this file
+            d3.json('data/states.geojson', function(states) {
                 drawMap(svg, geojson, states);
             });
         });

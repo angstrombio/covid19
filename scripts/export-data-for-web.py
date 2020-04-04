@@ -108,7 +108,7 @@ def load(areas_geojsonfile, output_folder, overwrite):
 
 def get_file_date(db):
     with db.cursor() as cursor:
-        cursor.execute("SELECT MAX(file_date) FROM covid19.jhu")
+        cursor.execute("SELECT MAX(file_date) FROM covid19.jhu_derived")
         result = cursor.fetchone()
         if result is None:
             return None
