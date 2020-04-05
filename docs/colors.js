@@ -23,6 +23,9 @@ function getColorInterpolator(settings) {
 
 function getColorMapFunction(field, settings) {
     let interpolator = getColorInterpolator(settings);
+    if (interpolator == null) {
+        return null;
+    }
     let logFunction = null;
     if (settings.logScaleColors) {
         logFunction = function(value) {
@@ -69,4 +72,10 @@ function getColorMapFunction(field, settings) {
             return interpolator(pct);
         }
     }
+}
+
+function isDarkColor(color) {
+    let rgb = d3.rgb(color);
+    let luminance = (0.2126 * rgb.r + 0.7152*rgb.g + 0.0722*rgb.b);
+    return luminance < 140;
 }

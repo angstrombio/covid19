@@ -1,4 +1,6 @@
 FieldDetails = {
+    area: {label: "Area/County"},
+    area_type: {label: "Type"},
     cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true},
     deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
     increase: {label: "New Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true},
@@ -10,12 +12,13 @@ FieldDetails = {
     hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true},
     hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true},
     icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
-    doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10 }
+    doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10, sortAscending: false }
 };
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
     fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'population', 'cases' ],
     tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling'],
+    tableFields: ['area', 'cases', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'doubling', 'deaths', 'cases_per_icu_bed', 'cases_per_bed','hospitals','hospital_beds','icu_beds','population'],
 
     targetWidth: 1000,
     targetHeight: 600,
@@ -27,6 +30,10 @@ MapOptions = {
 
     historyIndex: -1,
 
+    allData: null,
+    showTables: false,
+    tablesShowSelections: false,
+    selectedAreaIds: []
 };
 
 function updateMetadata(metadata) {
@@ -76,6 +83,20 @@ function drawEmptyMapPlaceholder() {
     return svg;
 }
 
+function regionClicked(d) {
+    if (MapOptions.showTables) {
+        let id = d.properties.id;
+        if (MapOptions.selectedAreaIds.includes(id)) {
+            MapOptions.selectedAreaIds = MapOptions.selectedAreaIds.filter(function(d) { return d !== id;});
+        } else {
+            MapOptions.selectedAreaIds.push(id);
+        }
+        if (MapOptions.tablesShowSelections) {
+            updateTable();
+        }
+    }
+}
+
 function drawMap(svg, geojson, states) {
     var g = svg.append('g')
         .classed('map-areas', true);
@@ -99,7 +120,8 @@ function drawMap(svg, geojson, states) {
         .attr('stroke-width', 0.1)
         .attr('d', geoPath)
         .on("mouseover", getShowTooltipFunction(MapOptions, FieldDetails))
-        .on("mouseout",  hideTooltipFunction);
+        .on("mouseout",  hideTooltipFunction)
+        .on("click", regionClicked);
 
     var gs = svg.append('g')
         .classed('map-states', true);
@@ -125,14 +147,20 @@ function updateMap() {
     drawLegend(MapOptions.currentField, settings, svg);
 }
 
-function initializeMap() {
+function initializeMap(shouldDrawTables = false) {
+    MapOptions.showTables = shouldDrawTables;
     initializeControls();
     let svg = drawEmptyMapPlaceholder();
     d3.json('data/metadata.json', function (metadata) {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
+            MapOptions.allData = geojson.features;
             d3.json('data/states.geojson', function(states) {
                 drawMap(svg, geojson, states);
+                if (MapOptions.showTables) {
+                    enableTables();
+                    updateTable();
+                }
             });
         });
     });

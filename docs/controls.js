@@ -37,6 +37,9 @@ function fieldSelected(field, shouldChangeState = true, shouldUpdateMap = true) 
         MapOptions.currentField = field;
         if (shouldUpdateMap) {
             updateMap();
+            if (MapOptions.showTables) {
+                updateTable();
+            }
         }
     }
 }
