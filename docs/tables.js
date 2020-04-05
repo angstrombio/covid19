@@ -1,7 +1,12 @@
 function enableTables() {
     MapOptions.showTables = true;
 
-    let table = d3.select("#county-tables").append('small').append('table');
+    let table = d3.select("#county-tables")
+        .append('small')
+        .classed('table-responsive-xl', true)
+        .append('table')
+        .classed('table', true)
+        .classed('table-bordered', true);
 
     table.append('thead').append('tr')
         .selectAll('th')
