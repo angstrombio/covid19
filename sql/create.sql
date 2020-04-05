@@ -171,7 +171,9 @@ create view covid19.cases_and_healthcare_historical_by_msa as (
         case when hc.licensed_beds is null or hc.licensed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.licensed_beds end as cases_per_licensed_bed,
         case when hc.staffed_beds is null or hc.staffed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.staffed_beds end as cases_per_staffed_bed,
         case when hc.icu_beds is null or hc.icu_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.icu_beds end as cases_per_icu_bed,
-        case when msa.pop_2018 is null then null else sum(cases_delta)::float/msa.pop_2018*10000 end as increase_per_10k_people
+        case when msa.pop_2018 is null then null else sum(cases_delta)::float/msa.pop_2018*10000 end as increase_per_10k_people,
+        case when msa.pop_2018 is null then null else sum(cases.deaths)::float/msa.pop_2018*10000 end as deaths_per_10k_people,
+        sum(deaths_delta) as deaths_today
     from covid19.census_msa msa
         inner join covid19.census_msa_counties mc on msa.cbsa=mc.cbsa
         left outer join covid19.jhu_derived cases on cases.fips=mc.fips_stcou
@@ -202,7 +204,9 @@ create view covid19.cases_and_healthcare_historical_by_county as (
         case when hc.licensed_beds is null or hc.licensed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.licensed_beds end as cases_per_licensed_bed,
         case when hc.staffed_beds is null or hc.staffed_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.staffed_beds end as cases_per_staffed_bed,
         case when hc.icu_beds is null or hc.icu_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.icu_beds end as cases_per_icu_bed,
-        case when counties.pop_2018 is null then null else sum(cases_delta)::float/counties.pop_2018*10000 end as increase_per_10k_people
+        case when counties.pop_2018 is null then null else sum(cases_delta)::float/counties.pop_2018*10000 end as increase_per_10k_people,
+        case when counties.pop_2018 is null then null else sum(cases.deaths)::float/counties.pop_2018*10000 end as deaths_per_10k_people,
+        sum(deaths_delta) as deaths_today
     from covid19.census counties
         inner join covid19.states states on counties.state=states.state_name
         left outer join covid19.jhu_derived cases on cases.fips=counties.fips
@@ -215,4 +219,23 @@ create view covid19.cases_and_healthcare_historical_combined as (
     select * from covid19.cases_and_healthcare_historical_by_msa
     UNION ALL
     select * from covid19.cases_and_healthcare_historical_by_county where fips not in (select fips_stcou from covid19.census_msa_counties)
+);
+create table covid19.bls_areas (
+    fips VARCHAR NOT NULL,
+    state VARCHAR NOT NULL,
+    state_abbr VARCHAR NOT NULL,
+    msa_code VARCHAR NOT NULL,
+    msa_name VARCHAR NOT NULL,
+    county_code VARCHAR NOT NULL,
+    township_code VARCHAR NOT NULL,
+    county_or_township_name VARCHAR NOT NULL
+);
+create table covid19.bls_oes (
+    area VARCHAR NOT NULL,
+    area_title VARCHAR NOT NULL,
+    area_type VARCHAR NOT NULL,
+    occ_code VARCHAR NOT NULL,
+    occ_title VARCHAR NOT NULL,
+    o_group VARCHAR NOT NULL,
+    tot_emp INTEGER
 );

@@ -19,8 +19,7 @@ def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_exist
             print("Invalid source location")
             return False
 
-        # TODO Need to fix this; don't currently have permission to do this
-        # refresh_mv(conn)
+        refresh_mv(conn)
 
 
 def find_source_dir(jhu_dir):
@@ -201,6 +200,7 @@ def clear_all_data(db):
 
 
 def refresh_mv(db):
+    print("Refreshing materialized view")
     with db.cursor() as cursor:
         cursor.execute("REFRESH MATERIALIZED VIEW covid19.jhu_derived")
 

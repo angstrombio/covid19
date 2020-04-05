@@ -23,6 +23,7 @@ def review(source):
                 if fips == last_fips:
                     if cases is not None and cases > 0 and not has_nonzero_cases:
                         last_county["last_nonzero_date"] = result[5]
+                        last_county["last_nonzero_cases"] = cases
                         has_nonzero_cases = True
 
                 else:
@@ -33,6 +34,7 @@ def review(source):
                     last_county = {"fips": fips, "state": state, "county": county, "is_state": is_state, "last_nonzero_date": None}
                     last_fips = fips
                     if cases is not None and cases > 0:
+                        last_county["last_nonzero_cases"] = cases
                         last_county["last_nonzero_date"] = result[5]
                         has_nonzero_cases = True
                     else:
@@ -134,9 +136,10 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
                 else:
                     state = county_details['state']
                     county = county_details['county']
-                    last_nonzero = county_details['last_nonzero_date']
+                    last_nonzero_cases = county_details['last_nonzero_cases']
+                    last_nonzero_date = county_details['last_nonzero_date']
                     if fips not in overrides_without_data:
-                        print("No data for county " + fips + " " + state + " " + county + ", last data was " + str(last_nonzero))
+                        print("No data for county " + fips + " " + state + " " + county + ", last data was " + str(last_nonzero_cases) + " on " + str(last_nonzero_date))
                     else:
                         overrides_without_data.remove(fips)
 
