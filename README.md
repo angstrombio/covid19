@@ -4,7 +4,7 @@ This is the code and data repository for the COVID-19 map, analysis and related 
 published by Angstrom Bio, Inc.  
 
 * Map and information: https://covid19.angstrom.bio
-* Additional Details: https://www.angstrom.bio/covid19
+* Additional Details: https://www.angstrom.bio/covid19.html
 
 ## Data Sources
 Angstrom makes no claims of ownership to source data.  We rely on several public data sources; see the page above for details and sources
