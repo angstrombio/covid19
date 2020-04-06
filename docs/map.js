@@ -14,13 +14,15 @@ FieldDetails = {
     icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
     doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10, sortAscending: false },
     deaths_increase: {label: "New Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
-    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true}
+    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true},
+    providers: {label: "Healthcare Providers", colorScheme: 'YlGn', format: ',d', logScaleColors:true},
+    all_healthcare_at_risk: {label: "Healthare Providers and Others at Risk", colorScheme: 'YlGn', format: ',d', logScaleColors:true}
 };
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
-    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'population', 'cases'],
-    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling'],
-    tableFields: ['area', 'cases', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'doubling', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed','hospitals','hospital_beds','icu_beds','population'],
+    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'population', 'cases','providers','all_healthcare_at_risk'],
+    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling','providers','all_healthcare_at_risk'],
+    tableFields: ['area', 'cases', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'doubling', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed','hospitals','hospital_beds','icu_beds','population','providers','all_healthcare_at_risk'],
 
     targetWidth: 1000,
     targetHeight: 600,
@@ -34,6 +36,7 @@ MapOptions = {
 
     allData: null,
     showTables: false,
+    loadProviderData: false,
     tablesShowSelections: false,
     selectedAreaIds: []
 };
@@ -149,8 +152,19 @@ function updateMap() {
     drawLegend(MapOptions.currentField, settings, svg);
 }
 
-function initializeMap(shouldDrawTables = false) {
+function storeProviderData(providers) {
+    MapOptions.allData.forEach(function(feature) {
+        providerData = providers[feature.properties.id];
+        if (providerData) {
+            feature.properties.providers = providerData.providers;
+            feature.properties.all_healthcare_at_risk = providerData.all_healthcare_at_risk
+        }
+    });
+}
+
+function initializeMap(shouldDrawTables = false, loadProviderData = false) {
     MapOptions.showTables = shouldDrawTables;
+    MapOptions.loadProviderData = loadProviderData;
     initializeControls();
     let svg = drawEmptyMapPlaceholder();
     d3.json('data/metadata.json', function (metadata) {
@@ -158,10 +172,17 @@ function initializeMap(shouldDrawTables = false) {
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             MapOptions.allData = geojson.features;
             d3.json('data/states.geojson', function(states) {
-                drawMap(svg, geojson, states);
-                if (MapOptions.showTables) {
-                    enableTables();
-                    updateTable();
+                if (loadProviderData) {
+                    d3.json('data/providers.json', function(providers) {
+                        storeProviderData(providers);
+                        drawMap(svg, geojson, states);
+                        if (MapOptions.showTables) {
+                            enableTables();
+                            updateTable();
+                        }
+                    })
+                } else {
+                    drawMap(svg, geojson, states);
                 }
             });
         });

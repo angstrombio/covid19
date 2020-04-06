@@ -66,7 +66,9 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
         "population": {"min": 999999, "max": 0},
         "increase": {"min": 0, "max": 0},
         "increase_per_10k_people": {"min": 0, "max": 0},
-        "doubling": {"min": 0, "max": 0}
+        "doubling": {"min": 0, "max": 0},
+        "providers": {"min": 0, "max": 0},
+        "all_healthcare_at_risk": {"min": 0, "max": 0}
     }
 
     with psycopg2.connect(dbname=coronadb.database, port=coronadb.port, user=coronadb.user, host=coronadb.host,
@@ -105,12 +107,13 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
         areas.save(output_geojsonfile)
         state_outlines.save(stateoutput_geojsonfile)
 
+        print("Extracting Provider Data")
+        export_providers(db, output_providers, metadata)
+
         print("Saving Metadata")
         with open(output_metadatafile, "w") as metadata_file:
             json.dump(metadata, metadata_file)
 
-        print("Extracting Provider Data")
-        export_providers(db, output_providers)
 
 
 def get_file_date(db):
@@ -124,13 +127,21 @@ def get_file_date(db):
             return file_date.strftime('%Y-%m-%d')
 
 
-def export_providers(db, providers_jsonfile):
+def export_providers(db, providers_jsonfile, metadata):
     with db.cursor() as cursor:
         cursor.execute("SELECT geoid, num_providers, num_other_at_risk FROM covid19.bls_providers_combined")
 
         all_providers = {}
         for row in cursor.fetchall():
-            all_providers[row[0]] = {"num_providers": row[1], "num_providers_and_others_and_risk": row[1]+row[2]}
+            geoid = row[0]
+            providers = row[1]
+            total = row[1] + row[2]
+            all_providers[geoid] = {"providers": providers, "all_healthcare_at_risk": total}
+
+            if providers > metadata['providers']['max']:
+                metadata['providers']['max'] = providers
+            if total > metadata['all_healthcare_at_risk']['max']:
+                metadata['all_healthcare_at_risk']['max'] = total
 
     with open(providers_jsonfile, "w") as providers_file:
         json.dump(all_providers, providers_file)
