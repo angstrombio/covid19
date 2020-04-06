@@ -6,6 +6,7 @@ import json
 import os
 import math
 
+
 def set_property(metadata, properties, title, value, round_digits=None):
     """ Helper method to set a property in the GeoJSON properties, skipping it if is null/empty """
     if value is not None and value != "":
@@ -42,9 +43,9 @@ def append_history(continuing, history, value, round_digits=None, date_format=No
     return False
 
 
-def load(areas_geojsonfile, output_folder, overwrite):
+def export_data(areas_geojsonfile, output_folder, overwrite):
     """
-        Loads our data into the appropriate GeoJSON file
+        Exports our data into the appropriate GeoJSON file
     """
     # Use defaults if not specified
     if areas_geojsonfile is None or areas_geojsonfile == "":
@@ -76,6 +77,7 @@ def load(areas_geojsonfile, output_folder, overwrite):
         output_geojsonfile = os.path.join(output_folder, file_date + '-cases-healthcare-history.geojson')
         stateoutput_geojsonfile = os.path.join(output_folder, 'states.geojson')
         output_metadatafile = os.path.join(output_folder, 'metadata.json')
+        output_providers = os.path.join(output_folder, 'providers.json')
 
         if not overwrite and os.path.exists(output_geojsonfile):
             print("ERROR: File exists, overwrite not specified")
@@ -107,6 +109,9 @@ def load(areas_geojsonfile, output_folder, overwrite):
         with open(output_metadatafile, "w") as metadata_file:
             json.dump(metadata, metadata_file)
 
+        print("Extracting Provider Data")
+        export_providers(db, output_providers)
+
 
 def get_file_date(db):
     with db.cursor() as cursor:
@@ -117,6 +122,18 @@ def get_file_date(db):
         else:
             file_date = result[0]
             return file_date.strftime('%Y-%m-%d')
+
+
+def export_providers(db, providers_jsonfile):
+    with db.cursor() as cursor:
+        cursor.execute("SELECT geoid, num_providers, num_other_at_risk FROM covid19.bls_providers_combined")
+
+        all_providers = {}
+        for row in cursor.fetchall():
+            all_providers[row[0]] = {"num_providers": row[1], "num_other_at_risk": row[2]}
+
+    with open(providers_jsonfile, "w") as providers_file:
+        json.dump(all_providers, providers_file)
 
 
 def load_data_into_feature(db, metadata, feature, area_id):
@@ -242,4 +259,4 @@ parser.add_argument("--input", type=str, help="MSA GeoJSON File to load")
 parser.add_argument("--outfolder", type=str, help="Output folder to write data and metadata")
 parser.add_argument("--overwrite", action='store_true', help='Whether to overwrite an existing file for the date being exported')
 args = parser.parse_args()
-load(args.input, args.outfolder, args.overwrite)
+export_data(args.input, args.outfolder, args.overwrite)

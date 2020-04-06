@@ -221,15 +221,21 @@ create view covid19.cases_and_healthcare_historical_combined as (
     select * from covid19.cases_and_healthcare_historical_by_county where fips not in (select fips_stcou from covid19.census_msa_counties)
 );
 create table covid19.bls_areas (
+    area_id VARCHAR NOT NULL,
+    area_type VARCHAR NOT NULL,
+    msa_name VARCHAR NOT NULL
+);
+create table covid19.bls_area_counties (
+    area_id VARCHAR NOT NULL,
     fips VARCHAR NOT NULL,
     state VARCHAR NOT NULL,
     state_abbr VARCHAR NOT NULL,
-    msa_code VARCHAR NOT NULL,
-    msa_name VARCHAR NOT NULL,
     county_code VARCHAR NOT NULL,
     township_code VARCHAR NOT NULL,
-    county_or_township_name VARCHAR NOT NULL
+    county_or_township_name VARCHAR NOT NULL,
+    fips_stcou VARCHAR NOT NULL
 );
+
 create table covid19.bls_oes (
     area VARCHAR NOT NULL,
     area_title VARCHAR NOT NULL,
@@ -239,3 +245,112 @@ create table covid19.bls_oes (
     o_group VARCHAR NOT NULL,
     tot_emp INTEGER
 );
+
+create table covid19.bls_area_types (
+    area_type_id VARCHAR NOT NULL,
+    area_type_name VARCHAR NOT NULL
+);
+
+select distinct bc.state_abbr -- a.msa_name, c.msa_name, a.state_abbr
+    from covid19.bls_areas ba
+    inner join covid19.bls_area_counties bc on ba.area_id=bc.area_id
+    left outer join covid19.census_msa c on ba.area_id=cast(c.cbsa as varchar)
+    where ba.area_type='4' 
+    and bc.state_abbr != 'PR'
+    and c.msa_name is null;
+    
+select c.cbsa, c.msa_name, c.msa_type, c.pop_2018 as msa_pop, cc.fips_stcou, cc.county_name, cc.pop_2018 as county_pop, hc.staffed_beds
+    from covid19.census_msa c
+    left outer join covid19.census_msa_counties cc on c.cbsa=cc.cbsa
+    left outer join covid19.healthcare_counties hc on cc.fips_stcou=hc.fips
+    left outer join covid19.bls_areas a on cast(c.cbsa as varchar)=a.area_id
+    where a.msa_name is null;
+    
+    
+select ba.area_id as bls_area, ba.area_type, ba.msa_name as bls_msa_name, bc.state_abbr as bls_state, bc.county_code, bc.township_code, bc.county_or_township_name as bls_county_name, cc.state as census_state, cc.county as census_county, cc.pop_2018 as county_pop, hc.staffed_beds
+    from covid19.bls_areas ba
+    inner join covid19.bls_area_counties bc on ba.area_id=bc.area_id
+    left outer join covid19.census cc on bc.fips_stcou=cc.fips
+    left outer join covid19.healthcare_counties hc on bc.fips_stcou=hc.fips
+    where ba.area_id not in (select cast(cbsa as varchar) from covid19.census_msa)
+    and ba.msa_name not like '%PR';
+    
+select ba.area_id as bls_area, ba.area_type, ba.msa_name as bls_msa_name, bc.state_abbr as bls_state, bc.county_code, bc.township_code, bc.county_or_township_name as bls_county_name, cc.state as census_state, cc.county as census_county, cc.pop_2018 as county_pop, cm.cbsa as census_msa_cbsa, cm.msa_name as census_msa_name, cm.pop_2018 as census_msa_pop, cm.msa_type as census_msa_type
+    from covid19.bls_areas ba
+    inner join covid19.bls_area_counties bc on ba.area_id=bc.area_id
+    left outer join covid19.census cc on bc.fips_stcou=cc.fips
+    left outer join covid19.healthcare_counties hc on bc.fips_stcou=hc.fips
+    left outer join covid19.census_msa cm on cast(cm.cbsa as varchar)=ba.area_id
+    where ba.msa_name not like '%PR';
+    
+
+create table covid19.bls_area_match_type (
+    area_id VARCHAR NOT NULL,
+    match_type VARCHAR NOT NULL
+);
+
+create table covid19.bls_area_towns (
+    area_id VARCHAR NOT NULL,
+    state_code VARCHAR NOT NULL,
+    county_code VARCHAR NOT NULL,
+    township_code VARCHAR NOT NULL,
+    town_or_county_name VARCHAR NOT NULL,
+    pct_of_msa_by_population FLOAT NOT NULL,
+    fips_stcou VARCHAR NOT NULL
+);
+    
+create table covid19.census_state_codes (
+    state_code VARCHAR NOT NULL,
+    state_name VARCHAR NOT NULL
+);
+
+create table covid19.bls_relevant_jobs (
+    occ_code VARCHAR,
+    occ_title VARCHAR,
+    is_provider BOOLEAN,
+    is_other_at_risk BOOLEAN
+);
+
+
+CREATE VIEW covid19.bls_providers_by_area AS (
+select bo.area as area_id, sum(case when brj.is_provider then bo.tot_emp else 0 end) as num_providers, sum(case when brj.is_other_at_risk then bo.tot_emp else 0 end) as num_other_at_risk
+from covid19.bls_oes bo
+inner join covid19.bls_relevant_jobs brj on bo.occ_code=brj.occ_code
+group by bo.area
+);
+
+CREATE VIEW covid19.bls_providers_by_census_msa AS (
+select ba.area_id, sum(pba.num_providers) as num_providers, sum(pba.num_other_at_risk) as num_other_at_risk 
+from covid19.bls_areas ba
+inner join covid19.bls_area_match_type bmt on ba.area_id=bmt.area_id
+inner join covid19.bls_providers_by_area pba on pba.area_id=ba.area_id
+inner join covid19.census_msa m on cast(m.cbsa as VARCHAR) = ba.area_id
+where bmt.match_type='census_msa'
+group by ba.area_id);
+
+CREATE VIEW covid19.bls_providers_by_census_nonmsa_counties AS (
+select ba.area_id, bat.fips_stcou, sum(round(pba.num_providers*bat.pct_of_msa_by_population)) as num_providers, sum(round(pba.num_other_at_risk*bat.pct_of_msa_by_population)) as num_other_at_risk
+from covid19.bls_areas ba
+inner join covid19.bls_area_match_type bmt on ba.area_id=bmt.area_id
+inner join covid19.bls_providers_by_area pba on pba.area_id=ba.area_id
+inner join covid19.bls_area_towns bat on ba.area_id=bat.area_id
+where bmt.match_type='allocate_county_or_town'
+group by ba.area_id, bat.fips_stcou);
+
+
+CREATE VIEW covid19.bls_providers_combined AS (
+SELECT cast(m.cbsa as VARCHAR) as GEOID, m.cbsa, NULL as fips, pm.num_providers as num_providers, pm.num_other_at_risk as num_other_at_risk
+from covid19.census_msa m
+inner join covid19.bls_providers_by_census_msa pm on cast(m.cbsa as VARCHAR)=pm.area_id
+UNION ALL
+SELECT cast(m.cbsa as VARCHAR) as GEOID, m.cbsa, NULL as fips, sum(bpc.num_providers) as num_providers, sum(bpc.num_other_at_risk)as num_other_at_risk
+from covid19.census_msa m
+inner join covid19.census_msa_counties c on m.cbsa=c.cbsa
+inner join covid19.bls_providers_by_census_nonmsa_counties bpc on c.fips_stcou=bpc.fips_stcou
+group by m.cbsa
+UNION ALL
+SELECT c.fips as GEOID, NULL as cbsa, c.fips as fips, sum(bpc.num_providers) as num_providers, sum(bpc.num_other_at_risk)as num_other_at_risk
+from covid19.census c
+inner join covid19.bls_providers_by_census_nonmsa_counties bpc on c.fips=bpc.fips_stcou
+where c.fips not in (select fips_stcou from covid19.census_msa_counties)
+group by c.fips);

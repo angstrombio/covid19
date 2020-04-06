@@ -2,6 +2,7 @@ import argparse
 import os
 import csv
 import psycopg2
+from psycopg2 import extras
 import coronadb
 from jhudata import OVERRIDES
 
@@ -104,6 +105,7 @@ def parse_original_format(db, file_date, lines, has_coordinates):
     count = 1
     with db.cursor() as cursor:
         reader = csv.reader(lines, delimiter=',')
+        all_data = []
         for row in reader:
             print(str(count) + " / " + str(len(lines)), end='\r')
             state = row[0]
@@ -119,13 +121,16 @@ def parse_original_format(db, file_date, lines, has_coordinates):
                 lat = None
                 long = None
 
-            insert_row(cursor, file_date, None, country, state, None, lat, long, last_update, cases, deaths, recovered, None, None)
+            all_data.append((file_date, None, country, state, None, lat, long, last_update, cases, deaths, recovered, None, None))
             count += 1
-    print()
+        print()
+        insert_rows(cursor, all_data)
 
 
 def parse_county_format(db, file_date, lines):
     count = 1
+    all_data = []
+
     with db.cursor() as cursor:
         reader = csv.reader(lines, delimiter=',')
         for row in reader:
@@ -167,21 +172,23 @@ def parse_county_format(db, file_date, lines):
             active = row[10]
             combined_key = row[11]
 
-            insert_row(cursor, file_date, fips, country, state, county, lat, long, last_update, cases, deaths, recovered, active, combined_key)
+            all_data.append((cursor, file_date, fips, country, state, county, lat, long, last_update, parse_number(cases),
+                             parse_number(deaths), parse_number(recovered), parse_number(active), combined_key))
             count += 1
-    print()
+        print()
+        insert_rows(cursor, all_data)
 
 
 def get_db_connection(host, port, name, user, pw):
     return psycopg2.connect(dbname=name, port=port, user=user, host=host, password=pw)
 
 
-def insert_row(cursor, file_date, fips, country, state, county, lat, long, last_update, cases, deaths, recovered, active, combined_key):
-    cursor.execute("""
-        INSERT INTO covid19.jhu (file_date, fips, country, state, county, lat, long, last_update, cases, deaths, recovered, active, combined_key)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                   (file_date, fips, country, state, county, lat, long, last_update,parse_number(cases),
-                    parse_number(deaths), parse_number(recovered), parse_number(active), combined_key))
+def insert_rows(cursor, all_data):
+    print("Inserting Data")
+    extras.execute_values(
+        cursor,
+        "INSERT INTO covid19.jhu (file_date, fips, country, state, county, lat, long, last_update, cases, deaths, recovered, active, combined_key) VALUES %s",
+        all_data)
 
 
 def check_existing_data(db, file_date):
@@ -193,6 +200,7 @@ def check_existing_data(db, file_date):
 
 def clear_all_data(db):
     with db.cursor() as cursor:
+        # noinspection SqlWithoutWhere
         cursor.execute("DELETE FROM covid19.jhu")
 
     db.commit()
