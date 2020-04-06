@@ -130,7 +130,7 @@ def export_providers(db, providers_jsonfile):
 
         all_providers = {}
         for row in cursor.fetchall():
-            all_providers[row[0]] = {"num_providers": row[1], "num_other_at_risk": row[2]}
+            all_providers[row[0]] = {"num_providers": row[1], "num_providers_and_others_and_risk": row[1]+row[2]}
 
     with open(providers_jsonfile, "w") as providers_file:
         json.dump(all_providers, providers_file)
