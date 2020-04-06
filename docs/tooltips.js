@@ -24,7 +24,7 @@ function getShowTooltipFunction(MapOptions, FieldDetails) {
             tooltipTop = window.pageYOffset + regionBoundingRect['y'] + regionBoundingRect['height'] + 5;
         } else {
             // Go up
-            tooltipTop = window.pageYOffset + regionBoundingRect['y'] - 250 - 5;
+            tooltipTop = window.pageYOffset + regionBoundingRect['y'] - 290 - 5;
             // todo window.pagexoffset
         }
 

@@ -172,7 +172,7 @@ def parse_county_format(db, file_date, lines):
             active = row[10]
             combined_key = row[11]
 
-            all_data.append((cursor, file_date, fips, country, state, county, lat, long, last_update, parse_number(cases),
+            all_data.append((file_date, fips, country, state, county, lat, long, last_update, parse_number(cases),
                              parse_number(deaths), parse_number(recovered), parse_number(active), combined_key))
             count += 1
         print()

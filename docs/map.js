@@ -14,7 +14,7 @@ FieldDetails = {
     icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
     doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10, sortAscending: false },
     deaths_increase: {label: "New Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
-    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: ',d', logScaleColors:true}
+    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true}
 };
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
