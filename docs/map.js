@@ -167,7 +167,13 @@ function initializeMap(shouldDrawTables = false, loadProviderData = false) {
     MapOptions.loadProviderData = loadProviderData;
     initializeControls();
     let svg = drawEmptyMapPlaceholder();
-    d3.json('data/metadata.json', function (metadata) {
+    const urlParams = new URLSearchParams(window.location.search);
+    let metadataUrl = 'data/metadata.json';
+    if (urlParam.get('test') != null && urlParams.get('test') === 'true') {
+        metadataUrl = 'data/metadata-test.json'
+    }
+
+    d3.json(metadataUrl, function (metadata) {
         updateMetadata(metadata);
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             MapOptions.allData = geojson.features;
