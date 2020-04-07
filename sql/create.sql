@@ -99,6 +99,36 @@ GRANT DELETE ON TABLE covid19.census_mdiv TO corona;
 GRANT DELETE ON TABLE covid19.census_msa_counties TO corona;
 GRANT DELETE ON TABLE covid19.census_mdiv_counties TO corona;
 GRANT DELETE on TABLE covid19.def_healthcare_data TO corona;
+
+select * from covid19.jhu limit 10;
+
+CREATE VIEW covid19.nyt_jhu_combined AS (
+select file_date, fips, state as state_name, county as county_name, cases, deaths, recovered, active from covid19.jhu where file_date >= '2020-03-22' and country = 'US'
+UNION ALL
+select file_date, fips, state_name, county_name, cases, deaths, 0 as recovered, 0 as active from covid19.nyt where file_date < '2020-03-22'
+);
+
+
+CREATE MATERIALIZED VIEW covid19.nyt_jhu_combined_derived AS (
+    select x.*, 
+        prior.file_date as prior_date,
+        prior.cases as prior_cases,
+        case when prior.cases is null then coalesce(x.cases, 0) else x.cases-prior.cases end as cases_delta,
+        prior.deaths as prior_deaths,
+        case when prior.deaths is null then coalesce(x.deaths, 0) else x.deaths-prior.deaths end as deaths_delta,
+        prior.recovered as prior_recovered,
+        case when prior.recovered is null then coalesce(x.recovered, 0) else x.recovered-prior.recovered end as recovered_delta,
+        prior.active as prior_active,
+        case when prior.active is null then coalesce(x.active, 0) else x.active-prior.active end as active_delta
+    from covid19.nyt_jhu_combined x
+        left outer join covid19.nyt_jhu_combined prior
+            on prior.file_date=x.file_date-1
+            and ((prior.state_name is null and x.state_name is null) or (prior.state_name=x.state_name))
+            and ((prior.county_name is null and x.county_name is null) or (prior.county_name=x.county_name))
+            and ((prior.fips is null and x.fips is null) or (prior.fips=x.fips))
+);
+
+
 CREATE MATERIALIZED VIEW covid19.jhu_derived AS
     select x.*, prior.file_date as prior_date,
     prior.cases as prior_cases, case when prior.cases is null then coalesce(x.cases,0) else x.cases-prior.cases end as cases_delta,
@@ -129,9 +159,11 @@ CREATE MATERIALIZED VIEW covid19.jhu_derived AS
         and ((prior3.fips is null and x.fips is null) or (prior3.fips=x.fips));
 
 
-CREATE VIEW covid19.cases_us_all AS select * from covid19.jhu_derived WHERE country='US';
+-- This view is no longer necessary since it is just a select all from the MV, but keeping for backwards compatibility
+-- In a prior iteration, we needed to filter the non-US cases here
+CREATE VIEW covid19.cases_us_all AS select * from covid19.nyt_jhu_combined_derived;
 
-CREATE VIEW covid19.cases_us_current AS select * from covid19.jhu_derived WHERE country='US' AND file_date=(select max(file_date) from covid19.jhu);
+CREATE VIEW covid19.cases_us_current AS select * from covid19.nyt_jhu_combined_derived WHERE file_date=(select max(file_date) from covid19.nyt_jhu_combined_derived);
 
 
 create view covid19.healthcare_counties as
@@ -176,7 +208,7 @@ create view covid19.cases_and_healthcare_historical_by_msa as (
         sum(deaths_delta) as deaths_today
     from covid19.census_msa msa
         inner join covid19.census_msa_counties mc on msa.cbsa=mc.cbsa
-        left outer join covid19.jhu_derived cases on cases.fips=mc.fips_stcou
+        left outer join covid19.nyt_jhu_combined_derived cases on cases.fips=mc.fips_stcou
         left outer join covid19.healthcare_msa hc on hc.cbsa=msa.cbsa
     group by msa.cbsa, msa.msa_type, msa.msa_name, msa.pop_2018, cases.file_date, hc.num_hospitals, hc.licensed_beds, hc.staffed_beds, hc.icu_beds, hc.combined_bed_utilization
     order by msa.cbsa, cases.file_date desc
@@ -209,7 +241,7 @@ create view covid19.cases_and_healthcare_historical_by_county as (
         sum(deaths_delta) as deaths_today
     from covid19.census counties
         inner join covid19.states states on counties.state=states.state_name
-        left outer join covid19.jhu_derived cases on cases.fips=counties.fips
+        left outer join covid19.nyt_jhu_combined_derived cases on cases.fips=counties.fips
         left outer join covid19.healthcare_counties hc on hc.fips=counties.fips
     where counties.county_num <> 0
     group by counties.fips, counties.county, counties.state, states.abbreviation, counties.pop_2018, cases.file_date, hc.num_hospitals, hc.licensed_beds, hc.staffed_beds, hc.icu_beds, hc.combined_bed_utilization
@@ -354,3 +386,12 @@ from covid19.census c
 inner join covid19.bls_providers_by_census_nonmsa_counties bpc on c.fips=bpc.fips_stcou
 where c.fips not in (select fips_stcou from covid19.census_msa_counties)
 group by c.fips);
+
+CREATE TABLE covid19.nyt (
+    file_date DATE NOT NULL, 
+    county_name VARCHAR NOT NULL,
+    state_name VARCHAR NOT NULL,
+    fips VARCHAR NOT NULL,
+    cases INTEGER,
+    deaths INTEGER
+);

@@ -1,22 +1,22 @@
 FieldDetails = {
-    area: {label: "Area/County"},
-    area_type: {label: "Type"},
-    cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true},
-    deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
-    increase: {label: "New Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true},
-    population: {label: "Population", colorScheme: "Greens", format: ',d', logScaleColors: true, forceColorMin: 50000},
-    cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Oranges", format: '.2f', logScaleColors: true},
-    increase_per_10k_people: {label: "New Cases per 10,000", colorScheme: "RdPu", format: '.2f', logScaleColors: true},
-    cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
-    cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true},
-    hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true},
-    hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true},
-    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true},
-    doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10, sortAscending: false },
-    deaths_increase: {label: "New Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true},
-    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true},
-    providers: {label: "Healthcare Providers", colorScheme: 'YlGn', format: ',d', logScaleColors:true},
-    all_healthcare_at_risk: {label: "Healthare Providers and Others at Risk", colorScheme: 'YlGn', format: ',d', logScaleColors:true}
+    area: {label: "Area/County", hasHistory: false},
+    area_type: {label: "Type", hasHistory: false},
+    cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true, hasHistory: true},
+    deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true, hasHistory: true},
+    increase: {label: "New Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true, hasHistory: true},
+    population: {label: "Population", colorScheme: "Greens", format: ',d', logScaleColors: true, forceColorMin: 50000, hasHistory: false},
+    cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Oranges", format: '.2f', logScaleColors: true, hasHistory: true},
+    increase_per_10k_people: {label: "New Cases per 10,000", colorScheme: "RdPu", format: '.2f', logScaleColors: true, hasHistory: true},
+    cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true, hasHistory: true},
+    cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true, hasHistory: true},
+    hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true, hasHistory: false},
+    hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true, hasHistory: false},
+    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true, hasHistory: false},
+    doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10, sortAscending: false, hasHistory: true},
+    deaths_increase: {label: "New Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true, hasHistory: true},
+    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true, hasHistory: true},
+    providers: {label: "Healthcare Providers", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false},
+    all_healthcare_at_risk: {label: "Healthare Providers and Others at Risk", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false}
 };
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
@@ -57,14 +57,15 @@ function updateMetadata(metadata) {
 }
 
 function getFieldValueForDisplay(d, field) {
-    if (MapOptions.historyIndex >= 0) {
+    if (MapOptions.historyIndex >= 0 && FieldDetails[field].hasHistory) {
         let history = d.properties[field + "_history"];
-        if (history != null) {
-            if (MapOptions.historyIndex >= history.length) {
-                return null;
-            }
-            return history[MapOptions.historyIndex];
+        if (history == null) {
+            return null;
         }
+        if (MapOptions.historyIndex >= history.length) {
+            return null;
+        }
+        return history[MapOptions.historyIndex];
     }
     return d.properties[field];
 }

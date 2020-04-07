@@ -24,3 +24,12 @@ select * from covid19.bls_oes limit 100;
 
 select *
 from covid19.bls_providers_combined x
+
+select distinct county_name, state_name, fips from covid19.nyt where fips not in (select fips from covid19.census);
+select max(file_date) from covid19.nyt;
+select * from covid19.nyt where file_date='2020-04-05'
+
+select jhu.file_date,jhu.fips, jhu.state, jhu.county, jhu.cases, jhu.deaths, jhu.recovered, jhu.active, nyt.state_name as nyt_state, nyt.county_name as nyt_county, nyt.cases as nyt_cases, nyt.deaths as nyt_deaths 
+from covid19.cases_us_current jhu
+    left outer join covid19.nyt nyt on jhu.fips=nyt.fips and nyt.file_date=jhu.file_date
+where jhu.fips != 'XXXXX' and jhu.fips < '80000'

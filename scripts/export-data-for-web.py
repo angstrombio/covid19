@@ -4,43 +4,10 @@ import coronadb
 import argparse
 import json
 import os
-import math
+from data import DataTracker
 
 
-def set_property(metadata, properties, title, value, round_digits=None):
-    """ Helper method to set a property in the GeoJSON properties, skipping it if is null/empty """
-    if value is not None and value != "":
-        if round_digits is not None:
-            properties[title] = round(value, round_digits)
-        else:
-            properties[title] = value
-        if title in metadata:
-            if value < metadata[title]['min']:
-                metadata[title]['min'] = value
-            if value > metadata[title]['max']:
-                metadata[title]['max'] = value
-
-
-def round_if_valid(value, digits):
-    if value is not None and value != "":
-        return round(value, digits)
-
-    return value
-
-
-def append_history(continuing, history, value, round_digits=None, date_format=None):
-    if continuing:
-        if value is not None and value != "":
-            if round_digits is not None:
-                history.append(round(value, round_digits))
-            elif date_format is not None:
-                history.append(value.strftime(date_format))
-            else:
-                history.append(value)
-
-            return True
-
-    return False
+MAX_HISTORY = 99
 
 
 def export_data(areas_geojsonfile, output_folder, overwrite):
@@ -56,25 +23,12 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
     metadata = {
         "last_file_date": None,
         "file_date_history": None,
-        "cases": {"min": 0, "max": 0},
-        "cases_per_10k_people": {"min": 0.0, "max": 0.0},
-        "deaths": {"min": 0, "max": 0},
-        "deaths_increase": {"min": 0, "max": 0},
-        "deaths_per_10k_people": {"min": 0, "max": 0},
-        "cases_per_bed": {"min": 0, "max": 0},
-        "cases_per_icu_bed": {"min": 0, "max": 0},
-        "population": {"min": 999999, "max": 0},
-        "increase": {"min": 0, "max": 0},
-        "increase_per_10k_people": {"min": 0, "max": 0},
-        "doubling": {"min": 0, "max": 0},
-        "providers": {"min": 0, "max": 0},
-        "all_healthcare_at_risk": {"min": 0, "max": 0}
     }
 
     with psycopg2.connect(dbname=coronadb.database, port=coronadb.port, user=coronadb.user, host=coronadb.host,
                           password=coronadb.password) as db:
 
-        file_date = get_file_date(db)
+        file_date, history_dates, all_dates_str = get_file_dates(db, metadata)
         print("Exporting data for " + file_date)
         output_geojsonfile = os.path.join(output_folder, file_date + '-cases-healthcare-history.geojson')
         stateoutput_geojsonfile = os.path.join(output_folder, 'states.geojson')
@@ -91,6 +45,31 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
         state_outlines = pygeoj.new()
         state_outlines.define_crs('name', name='name": "urn:ogc:def:crs:EPSG::4269')
 
+        all_data = {}
+        count = 1
+        with db.cursor() as cursor:
+            cursor.execute("""SELECT GEOID, area_name, area_type, population,
+                    file_date, cases, cases_per_10k_people, deaths, recovered, active,
+                    increase_yesterday, num_hospitals, staffed_beds, icu_beds,  
+                    cases_per_staffed_bed, cases_per_icu_bed, increase_per_10k_people,
+                    deaths_today, deaths_per_10k_people
+                    FROM covid19.cases_and_healthcare_historical_combined WHERE file_date in (""" + all_dates_str + """) 
+                     ORDER BY GEOID, file_date DESC""")
+
+            for row in cursor.fetchall():
+                print(count, end='\r')
+                area_id = row[0]
+                if area_id in all_data:
+                    data = all_data[area_id]
+                else:
+                    data = DataTracker(file_date, history_dates, metadata, area_id)
+                    all_data[area_id] = data
+
+                data.add_data_row(row)
+                count += 1
+            print()
+
+        print("Processing GeoJSON")
         total = len(geo_features)
         count = 1
         for feature in geo_features:
@@ -100,7 +79,14 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
             if use_type is not None and use_type == 'STATE_OUTLINE':
                 state_outlines.add_feature(feature)
             else:
-                areas.add_feature(load_data_into_feature(db, metadata, feature, area_id))
+                if area_id in all_data:
+                    data = all_data[area_id]
+                    feature.properties = data.to_properties()
+                else:
+                    feature.properties = {'id': area_id, 'name': feature.properties['NAME']}
+
+                areas.add_feature(feature)
+
             count = count + 1
 
         print("Saving Export File")
@@ -115,22 +101,44 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
             json.dump(metadata, metadata_file)
 
 
-
-def get_file_date(db):
+def get_file_dates(db, metadata):
     with db.cursor() as cursor:
-        cursor.execute("SELECT MAX(file_date) FROM covid19.jhu_derived")
-        result = cursor.fetchone()
-        if result is None:
+        cursor.execute("SELECT DISTINCT file_date FROM covid19.cases_and_healthcare_historical_by_county ORDER BY file_date DESC")
+        rows = cursor.fetchall()
+        if rows is None:
             return None
-        else:
-            file_date = result[0]
-            return file_date.strftime('%Y-%m-%d')
+
+        current_date = None
+        date_history = []
+        all_dates_str = ''
+
+        for row in rows:
+            file_date = row[0].strftime('%Y-%m-%d')
+
+            if current_date is None:
+                current_date = file_date
+            else:
+                date_history.append(file_date)
+                all_dates_str += ', '
+
+            all_dates_str += '\'' + file_date + '\''
+
+        # TODO: Select dates, not just most recent
+        if len(date_history) > MAX_HISTORY:
+            date_history = date_history[0:MAX_HISTORY]
+
+        metadata['last_file_date'] = current_date
+        metadata['file_date_history'] = date_history
+
+        return current_date, date_history, all_dates_str
 
 
 def export_providers(db, providers_jsonfile, metadata):
     with db.cursor() as cursor:
         cursor.execute("SELECT geoid, num_providers, num_other_at_risk FROM covid19.bls_providers_combined")
 
+        metadata['providers'] = {'min': 0, 'max': 0}
+        metadata['all_healthcare_at_risk'] = {'min': 0, 'max': 0}
         all_providers = {}
         for row in cursor.fetchall():
             geoid = row[0]
@@ -146,122 +154,6 @@ def export_providers(db, providers_jsonfile, metadata):
     with open(providers_jsonfile, "w") as providers_file:
         json.dump(all_providers, providers_file)
 
-
-def load_data_into_feature(db, metadata, feature, area_id):
-    with db.cursor() as cursor:
-        cursor.execute("""SELECT GEOID, area_name, area_type, population,
-                file_date, cases, cases_per_10k_people, deaths, recovered, active,
-                increase_yesterday, num_hospitals, staffed_beds, icu_beds,  
-                cases_per_staffed_bed, cases_per_icu_bed, increase_per_10k_people,
-                deaths_today, deaths_per_10k_people
-                FROM covid19.cases_and_healthcare_historical_combined WHERE geoid=%s""",
-                       (area_id,))
-
-        result = cursor.fetchone()
-        # Note that the GeoJSON file has regions for PR and other US terriotiries, which we don't have any data for, so we skip them here
-        if result is not None:
-            # We are going to recreate the properties for each feature (metro area) in our GeoJSON file - we don't really want any
-            # of the original properties, and will instead fill in information we loaded from the DB
-            feature.properties = {"id": area_id, "area": result[1], "area_type": result[2]}
-            file_date = result[4].strftime('%Y-%m-%d')
-            if metadata['last_file_date'] is None or file_date > metadata['last_file_date']:
-                metadata['last_file_date'] = file_date
-
-            set_property(metadata, feature.properties, "population", result[3])
-            cases_today = result[5]
-            set_property(metadata, feature.properties, "cases", cases_today)
-
-            set_property(metadata, feature.properties, "cases_per_10k_people", result[6], round_digits=2)
-            set_property(metadata, feature.properties, "deaths", result[7])
-            # set_property(feature.properties, "recovered", result[8])
-            # set_property(feature.properties, "active", result[9])
-            set_property(metadata, feature.properties, "increase", result[10])
-            set_property(metadata, feature.properties, "hospitals", result[11])
-            set_property(metadata, feature.properties, "hospital_beds", result[12])
-            set_property(metadata, feature.properties, "icu_beds", result[13])
-            set_property(metadata, feature.properties, "cases_per_bed", result[14], round_digits=2)
-            set_property(metadata, feature.properties, "cases_per_icu_bed", result[15], round_digits=2)
-            set_property(metadata, feature.properties, "increase_per_10k_people", result[16], round_digits=3)
-            set_property(metadata, feature.properties, "deaths_increase", result[17])
-            set_property(metadata, feature.properties, "deaths_per_10k_people", result[18], round_digits=3)
-
-            history_rows = cursor.fetchall()
-            has_history = False
-            date_history = []
-            cases_history = []
-            deaths_history = []
-            cases_per_10k_people_history = []
-            increase_per_10k_people_history = []
-            cases_per_icu_bed_history = []
-            deaths_per_10k_people_history = []
-            deaths_increase_history = []
-            increase_history = []
-            continue_deaths = True
-            continue_per_capita = True
-            continue_per_icu = True
-            continue_increase = True
-            continue_increase_per_capita = True
-            continue_deaths_increase = True
-            continue_deaths_per_capita = True
-
-            num_days_with_cases = 0
-
-            for result in history_rows:
-                # Process historical data
-                has_history = True
-                append_history(True, date_history, result[4], date_format='%Y-%m-%d')
-                cases_history.append(result[5])
-                if result[5] > 0:
-                    num_days_with_cases += 1
-                continue_per_capita = append_history(continue_per_capita, cases_per_10k_people_history, result[6], round_digits=2)
-                continue_deaths = append_history(continue_deaths, deaths_history, result[7])
-                continue_increase = append_history(continue_increase, increase_history, result[10])
-                continue_per_icu = append_history(continue_per_icu, cases_per_icu_bed_history, result[15], round_digits=2)
-                continue_increase_per_capita = append_history(continue_increase_per_capita, increase_per_10k_people_history, result[16], round_digits=3)
-                continue_deaths_increase = append_history(continue_deaths_increase, deaths_increase_history, result[17])
-                continue_deaths_per_capita = append_history(continue_deaths_per_capita, deaths_per_10k_people_history, result[18], round_digits=3)
-
-            if has_history:
-                if metadata['file_date_history'] is None or len(metadata['file_date_history']) < len(date_history):
-                    metadata['file_date_history'] = date_history
-
-                feature.properties['date_history'] = date_history
-                feature.properties['cases_history'] = cases_history
-                feature.properties['cases_per_10k_people_history'] = cases_per_10k_people_history
-                feature.properties['deaths_history'] = deaths_history
-                feature.properties['increase_history'] = increase_history
-                feature.properties['cases_per_icu_bed_history'] = cases_per_icu_bed_history
-                feature.properties['increase_per_10k_people_history'] = increase_per_10k_people_history
-                feature.properties['deaths_increase_history'] = deaths_increase_history
-                feature.properties['deaths_per_10k_people_history'] = deaths_per_10k_people_history
-
-                # Calculate growth rate as # days the number is doubling over the last week
-                # growth rate = (log(cases) - log(cases 7 days ago)/log(2)  ---- # of doubling in the last week
-                # doubling = 7/growth rate (# of days to double)
-                # Like NYT, only calculate when we have 7 days of data and cases > 20
-                index_current = -1
-                index_1week = 6
-                continue_growth = True
-                growth_history = []
-                while continue_growth and len(cases_history) > index_1week:
-                    cases_current = (cases_today if index_current < 0 else cases_history[index_current])
-                    cases_1week = cases_history[index_1week]
-                    if cases_current < 20 or cases_1week == 0:
-                        continue_growth = False
-                    else:
-                        growth_rate_1wk = (math.log(cases_current) - math.log(cases_1week)) / math.log(2)
-                        doubling = 7 / growth_rate_1wk
-                        if index_current < 0:
-                            set_property(metadata, feature.properties, 'doubling', doubling, round_digits=1)
-                        else:
-                            continue_growth = append_history(continue_growth, growth_history, doubling, round_digits=1)
-
-                    index_current += 1
-                    index_1week += 1
-
-                feature.properties['doubling_history'] = growth_history
-
-    return feature
 
 
 # Main part of the script: just examine/verify command line and invoke our loader

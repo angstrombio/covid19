@@ -20,6 +20,9 @@ function drawLegend(field, settings, svg) {
         colorMax = settings['forceColorMax']
     }
     let rangeMax = settings.dataMax;
+    if (field === 'doubling') {
+        rangeMax = 10; // TODO JF
+    }
 
     let logFunction = null;
     if (settings.logScaleColors) {
