@@ -211,6 +211,7 @@ def refresh_mv(db):
     print("Refreshing materialized view")
     with db.cursor() as cursor:
         cursor.execute("REFRESH MATERIALIZED VIEW covid19.jhu_derived")
+        cursor.execute("REFRESH MATERIALIZED VIEW covid19.nyt_jhu_combined_derived")
 
 
 def clear_file_data(db, file_date):
