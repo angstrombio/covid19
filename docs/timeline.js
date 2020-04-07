@@ -19,7 +19,7 @@ function triggerTimelineAnimation() {
         clearInterval(ANIMATION_TIMER);
     } else {
         setHistoryRangeValue(0, true);
-        ANIMATION_TIMER = setInterval(historyRangeTimerStep, 2000);
+        ANIMATION_TIMER = setInterval(historyRangeTimerStep, 900);
     }
     ANIMATION_PLAYING = !ANIMATION_PLAYING;
 }
