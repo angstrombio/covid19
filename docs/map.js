@@ -169,7 +169,7 @@ function initializeMap(shouldDrawTables = false, loadProviderData = false) {
     let svg = drawEmptyMapPlaceholder();
     const urlParams = new URLSearchParams(window.location.search);
     let metadataUrl = 'data/metadata.json';
-    if (urlParam.get('test') != null && urlParams.get('test') === 'true') {
+    if (urlParams.get('test') != null && urlParams.get('test') === 'true') {
         metadataUrl = 'data/metadata-test.json'
     }
 
