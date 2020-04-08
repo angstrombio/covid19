@@ -128,13 +128,9 @@ CREATE MATERIALIZED VIEW covid19.nyt_jhu_combined_derived AS (
             and ((prior.fips is null and x.fips is null) or (prior.fips=x.fips))
 );
 
-
 CREATE MATERIALIZED VIEW covid19.jhu_derived AS
     select x.*, prior.file_date as prior_date,
     prior.cases as prior_cases, case when prior.cases is null then coalesce(x.cases,0) else x.cases-prior.cases end as cases_delta,
-    prior2.cases as prior_cases2, prior3.cases as prior_cases3,
-    case when prior2.cases is null then coalesce(x.cases,0) else x.cases-prior2.cases end as cases_delta2,
-    case when prior3.cases is null then coalesce(x.cases,0) else x.cases-prior3.cases end as cases_delta3,
     prior.deaths as prior_deaths, case when prior.deaths is null then coalesce(x.deaths,0) else x.deaths-prior.deaths end as deaths_delta,
     prior.recovered as prior_recovered, case when prior.recovered is null then coalesce(x.recovered,0) else x.recovered-prior.recovered end as recovered_delta,
     prior.active as prior_active, case when prior.active is null then coalesce(x.active,0) else x.active-prior.active end as active_delta
@@ -144,19 +140,7 @@ CREATE MATERIALIZED VIEW covid19.jhu_derived AS
         and prior.country=x.country
         and ((prior.state is null and x.state is null) or (prior.state=x.state))
         and ((prior.county is null and x.county is null) or (prior.county=x.county))
-        and ((prior.fips is null and x.fips is null) or (prior.fips=x.fips))
-        left outer join covid19.jhu prior2
-        on prior2.file_date=x.file_date-2
-        and prior2.country=x.country
-        and ((prior2.state is null and x.state is null) or (prior2.state=x.state))
-        and ((prior2.county is null and x.county is null) or (prior2.county=x.county))
-        and ((prior2.fips is null and x.fips is null) or (prior2.fips=x.fips))
-        left outer join covid19.jhu prior3
-        on prior3.file_date=x.file_date-3
-        and prior3.country=x.country
-        and ((prior3.state is null and x.state is null) or (prior3.state=x.state))
-        and ((prior3.county is null and x.county is null) or (prior3.county=x.county))
-        and ((prior3.fips is null and x.fips is null) or (prior3.fips=x.fips));
+        and ((prior.fips is null and x.fips is null) or (prior.fips=x.fips));
 
 
 -- This view is no longer necessary since it is just a select all from the MV, but keeping for backwards compatibility

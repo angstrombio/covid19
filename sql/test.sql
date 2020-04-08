@@ -33,3 +33,5 @@ select jhu.file_date,jhu.fips, jhu.state, jhu.county, jhu.cases, jhu.deaths, jhu
 from covid19.cases_us_current jhu
     left outer join covid19.nyt nyt on jhu.fips=nyt.fips and nyt.file_date=jhu.file_date
 where jhu.fips != 'XXXXX' and jhu.fips < '80000'
+
+select file_date, count(*) from covid19.jhu group by file_date order by file_date;

@@ -121,7 +121,7 @@ def parse_original_format(db, file_date, lines, has_coordinates):
                 lat = None
                 long = None
 
-            all_data.append((file_date, None, country, state, None, lat, long, last_update, cases, deaths, recovered, None, None))
+            all_data.append((file_date, None, country, state, None, lat, long, last_update, parse_number(cases), parse_number(deaths), parse_number(recovered), None, None))
             count += 1
         print()
         insert_rows(cursor, all_data)
