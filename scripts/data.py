@@ -125,7 +125,7 @@ class DataTracker:
             else:
                 cases_current = self.data[position]['cases']
                 cases_1week = self.data[position_1week_back]['cases']
-                if cases_current < 20 or cases_1week == 0:
+                if cases_current < 20 or cases_1week == 0 or cases_current == cases_1week:
                     # Stop and return what we have
                     return doubling_rates
                 else:
