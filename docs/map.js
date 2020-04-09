@@ -104,7 +104,9 @@ function regionClicked(d) {
 }
 
 function drawMap(svg, geojson, states) {
-    var g = svg.append('g')
+    svg.append('i').classed('fa', true).classed('fa-play', true).attr('x', 10).attr('y', 10).attr('width', 25).attr('height', 25).text('foo');
+    var baseGroup = svg.append('g').classed('map-zoom-items', true);
+    var g = baseGroup.append('g')
         .classed('map-areas', true);
 
     svg.select('#loading-text').remove();
@@ -129,7 +131,17 @@ function drawMap(svg, geojson, states) {
         .on("mouseout",  hideTooltipFunction)
         .on("click", regionClicked);
 
-    var gs = svg.append('g')
+    const zoom = d3.zoom()
+        .scaleExtent([1, 40])
+        .translateExtent([[0,0], [MapOptions.targetWidth, MapOptions.targetHeight]])
+        .extent([[0, 0], [MapOptions.targetWidth, MapOptions.targetHeight]])
+        .on('zoom', function() {
+            baseGroup.attr('transform', d3.event.transform);
+        });
+
+    svg.call(zoom).on("wheel.zoom", null);
+
+    var gs = baseGroup.append('g')
         .classed('map-states', true);
     gs.selectAll('path')
         .data(states.features)
@@ -140,7 +152,54 @@ function drawMap(svg, geojson, states) {
         .attr('d', geoPath)
         .attr('fill', 'none');
 
-    drawLegend(MapOptions.currentField, settings, svg);
+    setupZoomButtons(svg, baseGroup, zoom);
+    drawLegend(MapOptions.currentField, settings, baseGroup);
+}
+
+function setupZoomButtons(svg, zoomArea, zoom) {
+    let zoomControlGroup = svg.append('g')
+        .classed('map-zoom-controls', true)
+        .attr('transform', 'translate(50, 50)');
+
+    let zoomIn = function() {
+        zoom.scaleBy(svg.transition().duration(500), 1.5);
+    };
+    let zoomOut = function() {
+        zoom.scaleBy(svg.transition().duration(500), 1/1.5);
+    };
+    let zoomReset = function() {
+        zoom.transform(svg.transition().duration(500), d3.zoomIdentity.scale(1));
+    };
+
+    let controls = [{label: 'Zoom In', icon: '\uf067', xOffset: 0, onClick: zoomIn},
+        {label: 'Zoom Out', icon: '\uf068', xOffset: 0, onClick: zoomOut},
+        {label: 'Reset Zoom', icon: '\uf015',  xOffset: -1,onClick: zoomReset}];
+
+    let buttonGroup = zoomControlGroup.selectAll('g')
+        .data(controls)
+        .enter()
+        .append('g')
+        .attr('transform', function(x, i) {
+            return 'translate(0, ' + 30 * i + ')';
+        });
+
+    buttonGroup.append('text')
+        .attr('font-family', 'FontAwesome')
+        .attr('fill', '#000')
+        .attr('x', function(d) { return d.xOffset })
+        .text(function(d) { return d.icon; });
+
+    let rect = buttonGroup.append('rect')
+        .attr('stroke','#000')
+        .attr('stroke-width', 0.2)
+        .attr('fill', 'rgba(100, 100, 100, 0.1)')
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr('x', -4)
+        .attr('y', -16)
+        .on('click', function(d) {
+            return d.onClick(d.label);
+        });
 }
 
 function updateMap() {
