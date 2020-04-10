@@ -62,42 +62,20 @@
                     </div>
                 </div>
 
-                <div class="row justify-content-md-center text-nowrap">
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-primary btn-sm" id="field-button-cases_per_icu_bed" onclick="fieldSelected('cases_per_icu_bed');">Cases per ICU Bed</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-cases_per_10k_people" onclick="fieldSelected('cases_per_10k_people');">Cases per 10,000</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-increase" onclick="fieldSelected('increase');">New Cases</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-increase_per_10k_people" onclick="fieldSelected('increase_per_10k_people');">New Cases per 10,000</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-doubling" onclick="fieldSelected('doubling');">Doubling Time (days)</button>
-                    </div>
+                <div class="row d-flex justify-content-center text-nowrap">
+                    <button type="button" class="btn btn-primary btn-sm mx-2 my-1" id="field-button-cases_per_icu_bed" onclick="fieldSelected('cases_per_icu_bed');">Cases per ICU Bed</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-cases_per_10k_people" onclick="fieldSelected('cases_per_10k_people');">Cases per 10,000</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-increase" onclick="fieldSelected('increase');">New Cases</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-increase_per_10k_people" onclick="fieldSelected('increase_per_10k_people');">New Cases per 10,000</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-doubling" onclick="fieldSelected('doubling');">Doubling Time</button>
                 </div>
-                <div class="row justify-content-md-center text-nowrap">
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-deaths" onclick="fieldSelected('deaths');">Deaths</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-deaths_increase" onclick="fieldSelected('deaths_increase');">New Deaths</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-deaths_per_10k_people" onclick="fieldSelected('deaths_per_10k_people');">Deaths per 10,000</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-population" onclick="fieldSelected('population');">Population</button>
-                    </div>
-                    <div class="col col-sm-auto px-2 py-1">
-                        <button type="button" class="btn btn-secondary btn-sm" id="field-button-cases" onclick="fieldSelected('cases');">Total Cases</button>
-                    </div>
+                <div class="row d-flex justify-content-center text-nowrap">
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths" onclick="fieldSelected('deaths');">Deaths</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_increase" onclick="fieldSelected('deaths_increase');">New Deaths</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_per_10k_people" onclick="fieldSelected('deaths_per_10k_people');">Deaths per 10,000</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-population" onclick="fieldSelected('population');">Population</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-cases" onclick="fieldSelected('cases');">Total Cases</button>
                 </div>
-                <div class="row justify-content-md-center">
-                    <div class="col col-sm-auto">
                         <div class="container-fluid py-2">
                             <div class="row">
                                 <div class="col-sm"></div>
@@ -123,8 +101,6 @@
                                 </div>
                                 <div class="col-sm"></div>
                             </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="container-fluid py-4">
@@ -313,7 +289,8 @@
                 <h3 class="text-heading">Change History</h3>
                 <div class="py-2 text-content">
                     <ul>
-                        <il>2020-04-06: Added more historical data back to the first U.S. cases</il>
+                        <li>2020-04-09: Added zoom support on the map</li>
+                        <li>2020-04-06: Added more historical data back to the first U.S. cases</li>
                         <li>2020-04-04: Added new deaths and deaths per 10,000 people</li>
                         <li>2020-04-03: Minor display changes and ability to link to specific layers of the map</li>
                         <li>2020-04-02: Added Doubling Time (days) as a measurement of rate of growth</li>
