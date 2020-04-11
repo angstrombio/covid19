@@ -120,6 +120,9 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
                     if fips not in IGNORED_COUNTIES:
                         print("County details not found for FIPS=" + fips + ", " + state + " " + county)
 
+            if row[9] is not None and row[9] != '' and int(row[9]) > 0:
+                print("Found active/recovered data for " + fips + ", " + state + " " + county)
+
     print("Counties Matched: " + str(counties_matched))
 
     # Now do the reverse comparison
