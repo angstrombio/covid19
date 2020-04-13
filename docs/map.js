@@ -104,20 +104,19 @@ function regionClicked(d) {
 }
 
 function drawMap(svg, geojson, states) {
-    svg.append('i').classed('fa', true).classed('fa-play', true).attr('x', 10).attr('y', 10).attr('width', 25).attr('height', 25).text('foo');
-    var baseGroup = svg.append('g').classed('map-zoom-items', true);
-    var g = baseGroup.append('g')
+    let baseGroup = svg.append('g').classed('map-zoom-items', true);
+    let g = baseGroup.append('g')
         .classed('map-areas', true);
 
     svg.select('#loading-text').remove();
 
-    var albersProjection = d3.geoAlbersUsa()
+    let albersProjection = d3.geoAlbersUsa()
         .scale(1200)
         .translate([MapOptions.targetWidth/2, MapOptions.targetHeight/2]);
 
-    var geoPath = d3.geoPath().projection(albersProjection);
+    let geoPath = d3.geoPath().projection(albersProjection);
 
-    var settings = getCurrentSettings();
+    let settings = getCurrentSettings();
 
     g.selectAll('path')
         .data(geojson.features)
@@ -127,7 +126,7 @@ function drawMap(svg, geojson, states) {
         .attr('stroke', '#bbb')
         .attr('stroke-width', 0.1)
         .attr('d', geoPath)
-        .on("mouseover", getShowTooltipFunction(MapOptions, FieldDetails))
+        .on("mouseover", getShowTooltipFunction())
         .on("mouseout",  hideTooltipFunction)
         .on("click", regionClicked);
 
@@ -141,7 +140,7 @@ function drawMap(svg, geojson, states) {
 
     svg.call(zoom).on("wheel.zoom", null);
 
-    var gs = baseGroup.append('g')
+    let gs = baseGroup.append('g')
         .classed('map-states', true);
     gs.selectAll('path')
         .data(states.features)
@@ -189,7 +188,7 @@ function setupZoomButtons(svg, zoomArea, zoom) {
         .attr('x', function(d) { return d.xOffset })
         .text(function(d) { return d.icon; });
 
-    let rect = buttonGroup.append('rect')
+    buttonGroup.append('rect')
         .attr('stroke','#000')
         .attr('stroke-width', 0.2)
         .attr('fill', 'rgba(100, 100, 100, 0.1)')

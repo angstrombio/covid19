@@ -1,5 +1,5 @@
 
-function getShowTooltipFunction(MapOptions, FieldDetails) {
+function getShowTooltipFunction() {
     let svg = d3.select('#map-content');
     let tooltip = d3.select("#tooltip");
 
@@ -12,6 +12,7 @@ function getShowTooltipFunction(MapOptions, FieldDetails) {
         let mapBoundingRect = svg.node().getBoundingClientRect();
         let mapMidPointX = (mapBoundingRect['x'] + mapBoundingRect['width'] / 2);
         let mapMidPointY = (mapBoundingRect['y'] + mapBoundingRect['height'] / 2);
+        let tooltipLeft, tooltipTop;
         if (regionBoundingRect['x'] < mapMidPointX) {
             // Go right
             tooltipLeft = regionBoundingRect['x'] + regionBoundingRect['width'] + 5;
@@ -51,7 +52,7 @@ function addToolTipHTML(tooltip, feature, backgroundColor) {
     tooltip.select(".tooltip-sub-header").html(feature.properties.area_type);
 
     MapOptions.tooltipFields.forEach(function(field) {
-        value = getToolTipFieldValue(feature, field);
+        let value = getToolTipFieldValue(feature, field);
         d3.select("#tooltip-value-" + field).html(value);
         d3.select("#tooltip-colorblock-" + field).style('background-color', getToolTipColorCell(feature, backgroundColor, field, value));
     });
@@ -63,7 +64,6 @@ function addToolTipHTML(tooltip, feature, backgroundColor) {
 function getToolTipFieldValue(feature, field) {
     let value = getFieldValueForDisplay(feature, field);
     let fieldFormat = FieldDetails[field].format;
-    let colorCell = null;
     if (value != null && fieldFormat != null) {
         value = d3.format(fieldFormat)(value);
     } else if (value == null) {

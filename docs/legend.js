@@ -51,6 +51,7 @@ function drawLegend(field, settings, svg) {
             if (logFunction != null) {
                 value = logFunction(value);
             }
+            let pct;
             if (value < colorMin) {
                 pct = 0;
             } else if (value > colorMax) {

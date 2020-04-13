@@ -20,7 +20,10 @@ def clear_healthcare_data(db):
     print("Cleaned database")
 
 
-_EXPECTED_HEADERS = ["X","Y","OBJECTID","HOSPITAL_NAME","HOSPITAL_TYPE","HQ_ADDRESS","HQ_ADDRESS1","HQ_CITY","HQ_STATE","HQ_ZIP_CODE","COUNTY_NAME","STATE_NAME","STATE_FIPS","CNTY_FIPS","FIPS","NUM_LICENSED_BEDS","NUM_STAFFED_BEDS","NUM_ICU_BEDS","BED_UTILIZATION","Potential_Increase_In_Bed_Capac"]
+_EXPECTED_HEADERS = ["X", "Y", "OBJECTID", "HOSPITAL_NAME", "HOSPITAL_TYPE", "HQ_ADDRESS", "HQ_ADDRESS1",
+                     "HQ_CITY", "HQ_STATE", "HQ_ZIP_CODE", "COUNTY_NAME", "STATE_NAME", "STATE_FIPS",
+                     "CNTY_FIPS", "FIPS", "NUM_LICENSED_BEDS", "NUM_STAFFED_BEDS", "NUM_ICU_BEDS",
+                     "BED_UTILIZATION", "Potential_Increase_In_Bed_Capac"]
 
 
 def load_healthcare_data(db, source):
@@ -30,7 +33,8 @@ def load_healthcare_data(db, source):
 
         for i, expected in enumerate(_EXPECTED_HEADERS):
             if header[i] != expected and expected != "X":
-                print("Unexpected header in column " + str(i) +": Expected \"" + expected + "\", found \"" + repr(header[i]) + "\"")
+                print("Unexpected header in column " + str(i) + ": Expected \"" + expected +
+                      "\", found \"" + repr(header[i]) + "\"")
                 return False
 
         count = 1

@@ -75,8 +75,8 @@ function getSelectedTableData() {
         return MapOptions.selectedAreaIds.includes(d.properties.id);
     });
     return filtered.sort(function(a, b) {
-        aPos = MapOptions.selectedAreaIds.indexOf(a);
-        bPos = MapOptions.selectedAreaIds.indexOf(b);
+        let aPos = MapOptions.selectedAreaIds.indexOf(a);
+        let bPos = MapOptions.selectedAreaIds.indexOf(b);
         if (aPos === bPos) {
             return 0;
         } else {

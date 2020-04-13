@@ -44,12 +44,13 @@ function setTimelineRange(min, max) {
 }
 
 function getHistoryRangeMax() {
-    return max = d3.select("#history-range").attr('max');
+    return d3.select("#history-range").attr('max');
 }
 
 function updateTimelineLabel() {
     let max = getHistoryRangeMax();
     let value = getHistoryRangeValue();
+    let historyLabel;
     if (value == max) {
         MapOptions.historyIndex = -1;
         historyLabel = MapOptions.lastUpdateDate;

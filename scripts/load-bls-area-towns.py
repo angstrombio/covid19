@@ -9,6 +9,7 @@ def load(source):
     with psycopg2.connect(dbname=coronadb.database, port=coronadb.port, user=coronadb.user, host=coronadb.host, password=coronadb.password) as db:
         load_data(db, source)
 
+
 def load_data(db, source):
     wb = load_workbook(filename=source, read_only=True)
     sheet = wb['load bls_area_towns']

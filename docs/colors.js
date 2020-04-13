@@ -62,6 +62,7 @@ function getColorMapFunction(field, settings) {
                     value = logFunction(value);
                 }
             }
+            let pct;
             if (value <= min) {
                 pct = 0.0;
             } else if (value >= max) {

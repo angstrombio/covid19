@@ -155,7 +155,6 @@ def export_providers(db, providers_jsonfile, metadata):
         json.dump(all_providers, providers_file)
 
 
-
 # Main part of the script: just examine/verify command line and invoke our loader
 parser = argparse.ArgumentParser(description='Script to load data from the database to GeoJSON for the web')
 parser.add_argument("--input", type=str, help="MSA GeoJSON File to load")

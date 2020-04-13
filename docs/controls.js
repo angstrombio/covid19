@@ -7,7 +7,7 @@ function initializeControls() {
         });
 
     window.onpopstate = function(event) {
-        state = event.state;
+        let state = event.state;
         if (state == null || state.field == null || FieldDetails[state.field] == null) {
             fieldSelected('cases_per_icu_bed', false);
         } else {

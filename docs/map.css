@@ -9,7 +9,7 @@ div.tooltip {
     height: 290px;
     padding: 4px;
     font: 12px sans-serif;
-    border: 0px;
+    border: 0;
     border-radius: 8px;
     pointer-events: none;
     opacity: 0;
