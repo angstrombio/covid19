@@ -49,7 +49,7 @@ def review(source):
 
         header = lines[0].strip()
         lines.pop(0)
-        if header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key":
+        if header == "Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Admin2,FIPS,Combined_Key,Incident_Rate,People_Tested,People_Hospitalized,UID,ISO3":
             parse_counties(lines, all_counties, OVERRIDES, OVERRIDE_COUNTIES_WITH_DATA)
 
         else:
@@ -77,10 +77,13 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
 
     reader = csv.reader(lines, delimiter=',')
     for row in reader:
-        fips = row[0]
-        county = row[1]
-        state = row[2]
-        country = row[3]
+        # 03-23-20 until 04-11-20 headers were FIPS[0],Admin2[1],Province_State[2],Country_Region[3],Last_Update[4],Lat[5],Long_[6],Confirmed[7],Deaths[8],Recovered[9],Active[10],Combined_Key[11]
+        # 04-12-20 onward headers were Province_State[0],Country_Region[1],Last_Update[2],Lat[3],Long_[4],Confirmed[5],Deaths[6],Recovered[7],Active[8],Admin2[9],FIPS[10],Combined_Key[11],Incident_Rate[12],People_Tested[13],People_Hospitalized[14],UID[15],ISO3[16]
+        # New/Ignored for now: Incident_Rate[12],People_Tested[13],People_Hospitalized[14],UID[15],ISO3[16]
+        fips = row[10]
+        county = row[9]
+        state = row[0]
+        country = row[1]
         if country == 'US':
             if fips is None or fips == '':
                 if state in overrides:
@@ -100,17 +103,17 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
 
             if fips is not None:
                 if len(fips) == 4:
-                    print("Fixing incorrect FIPS code")
+                    # print("Fixing incorrect FIPS code, was '" + fips + "', fixing with '0" + fips + "'")
                     fips = '0' + fips
 
-                # last_update = row[4]
-                # lat = row[5]
-                # long = row[6]
-                # cases = row[7]
-                # deaths = row[8]
-                # recovered = row[9]
-                # active = row[10]
-                # combined_key = row[11]
+                # last_update = row[2]
+                # lat = row[3]
+                # long = row[4]
+                # cases = row[5]
+                # deaths = row[6]
+                # recovered = row[7]
+                # active = row[8]
+                # combined_key = row[9]
 
                 if fips in all_counties:
                     county_details = all_counties[fips]
@@ -120,7 +123,7 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
                     if fips not in IGNORED_COUNTIES:
                         print("County details not found for FIPS=" + fips + ", " + state + " " + county)
 
-            if row[9] is not None and row[9] != '' and int(row[9]) > 0:
+            if row[7] is not None and row[7] != '' and int(row[7]) > 0:
                 print("Found active/recovered data for " + fips + ", " + state + " " + county)
 
     print("Counties Matched: " + str(counties_matched))
