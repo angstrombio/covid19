@@ -68,8 +68,7 @@ def load_file(db, source, file_date, reload, skip_existing):
     # Which format?
     # 01-22-20 until 02-29-20 headers were Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered
     # 03-01-20 until 03-22-20 headers were Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered,Latitude,Longitude
-    # 03-23-20 until 04-11-20 headers were FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key
-    # 04-12-20 onward headers were Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Admin2,FIPS,Combined_Key,Incident_Rate,People_Tested,People_Hospitalized,UID,ISO3
+    # 03-23-20 onward headers were FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key
     header = lines[0].strip()
     lines.pop(0)
     if header == "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered":
@@ -80,9 +79,6 @@ def load_file(db, source, file_date, reload, skip_existing):
 
     elif header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key":
         parse_county_format(db, file_date, lines)
-
-    elif header == "Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Admin2,FIPS,Combined_Key,Incident_Rate,People_Tested,People_Hospitalized,UID,ISO3":
-        parse_county_format2(db, file_date, lines)
 
     else:
         raise ValueError("Unrecognized header format: " + header)
@@ -176,61 +172,6 @@ def parse_county_format(db, file_date, lines):
             recovered = row[9]
             active = row[10]
             combined_key = row[11]
-
-            all_data.append((file_date, fips, country, state, county, lat, long, last_update, parse_number(cases),
-                             parse_number(deaths), parse_number(recovered), parse_number(active), combined_key))
-            count += 1
-        print()
-        insert_rows(cursor, all_data)
-
-
-def parse_county_format2(db, file_date, lines):
-    count = 1
-    all_data = []
-
-    with db.cursor() as cursor:
-        reader = csv.reader(lines, delimiter=',')
-        for row in reader:
-            print(str(count) + " / " + str(len(lines)), end='\r')
-            # 03-23-20 until 04-11-20 headers were FIPS[0],Admin2[1],Province_State[2],Country_Region[3],Last_Update[4],Lat[5],Long_[6],Confirmed[7],Deaths[8],Recovered[9],Active[10],Combined_Key[11]
-            # 04-12-20 onward headers were Province_State[0],Country_Region[1],Last_Update[2],Lat[3],Long_[4],Confirmed[5],Deaths[6],Recovered[7],Active[8],Admin2[9],FIPS[10],Combined_Key[11],Incident_Rate[12],People_Tested[13],People_Hospitalized[14],UID[15],ISO3[16]
-            # New/Ignored for now: Incident_Rate[12],People_Tested[13],People_Hospitalized[14],UID[15],ISO3[16]
-            fips = row[10]
-            county = row[9]
-            state = row[0]
-            country = row[1]
-            if country == 'US':
-                if fips is None or fips == '':
-                    if state in OVERRIDES:
-                        state_overrides = OVERRIDES[state]
-                        if county in state_overrides:
-                            new_fips = state_overrides[county]
-                            if new_fips is None or new_fips == '':
-                                print()
-                                print("Found override for county, but FIPS is still empty: " + state + "." + county)
-                            else:
-                                fips = new_fips
-                        else:
-                            print()
-                            print("NO MATCHING FIPS: " + state + "." + county)
-                    else:
-                        print()
-                        print("NO MATCHING FIPS: " + state + "." + county)
-
-                elif len(fips) == 4:
-                    # Sometimes fips is too short - because it wasn't
-                    print()
-                    print("Fixing incorrect FIPS code")
-                    fips = '0' + fips
-
-            last_update = row[2]
-            lat = row[3]
-            long = row[4]
-            cases = row[5]
-            deaths = row[6]
-            recovered = row[7]
-            active = row[8]
-            combined_key = row[9]
 
             all_data.append((file_date, fips, country, state, county, lat, long, last_update, parse_number(cases),
                              parse_number(deaths), parse_number(recovered), parse_number(active), combined_key))
