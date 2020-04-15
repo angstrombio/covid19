@@ -35,3 +35,4 @@ from covid19.cases_us_current jhu
 where jhu.fips != 'XXXXX' and jhu.fips < '80000'
 
 select file_date, count(*) from covid19.jhu group by file_date order by file_date;
+select * from covid19.cases_and_healthcare_historical_combined order by increase_per_10k_people asc limit 100;

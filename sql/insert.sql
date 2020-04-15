@@ -29,3 +29,7 @@ INSERT INTO covid19.bls_relevant_jobs (occ_code, occ_title, is_provider, is_othe
 INSERT INTO covid19.bls_relevant_jobs (occ_code, occ_title, is_provider, is_other_at_risk) VALUES ('29-1228', 'Physicians, All Other; and Ophthalmologists, Except Pediatric', TRUE, FALSE);
 INSERT INTO covid19.bls_relevant_jobs (occ_code, occ_title, is_provider, is_other_at_risk) VALUES ('29-1248', 'Surgeons, Except Ophthalmologists', TRUE, FALSE);
 INSERT INTO covid19.bls_relevant_jobs (occ_code, occ_title, is_provider, is_other_at_risk) VALUES ('29-2061', 'Licensed Practical and Licensed Vocational Nurses', FALSE, TRUE);
+
+
+-- Correct big mistake in JHU data
+update covid19.jhu set cases=103 where fips='12091' and file_date='2020-04-13';
