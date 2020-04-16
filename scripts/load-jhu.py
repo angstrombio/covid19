@@ -7,7 +7,7 @@ import coronadb
 from jhudata import OVERRIDES
 
 
-def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_existing):
+def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_existing, skip_mv):
     with get_db_connection(dbhost, dbport, dbname, dbuser, dbpw) as conn:
         if clean:
             clear_all_data(conn)
@@ -20,7 +20,8 @@ def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_exist
             print("Invalid source location")
             return False
 
-        refresh_mv(conn)
+        if not skip_mv:
+            refresh_mv(conn)
 
 
 def find_source_dir(jhu_dir):
@@ -229,7 +230,8 @@ parser.add_argument("--source", required=True, type=str, help="Directory or sing
 parser.add_argument("--clean", action="store_true", help="If true, clears the data before loading")
 parser.add_argument("--reload", action="store_true", help="If true, deletes any existing data that matches the file date")
 parser.add_argument("--skip_existing", action="store_true", help="If true, skips files containing dates already in the DB")
+parser.add_argument("--skip_mv", action="store_true", help="If true, skips refreshing the stored materialized view (e.g. if a second load will be done afterwards).")
 
 args = parser.parse_args()
 
-load(args.source, coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password, args.clean, args.reload, args.skip_existing)
+load(args.source, coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password, args.clean, args.reload, args.skip_existing, args.skip_mv)

@@ -4,10 +4,6 @@ OVERRIDES = {
             "McDuffie": "13189",
             "McIntosh": "13191",
         },
-    "Illinois":
-        {
-            "LaSalle": "17099",
-        },
     "Louisiana":
         {
             "LaSalle": "22059",
@@ -19,11 +15,8 @@ OVERRIDES = {
     "Michigan":
         {
             "Out of MI": "XXXXX",
-        },
-    "Minnesota":
-        {
-            "Fillmore": "27045",
-            "Lac qui Parle": "27073",
+            "Federal Correctional Institution (FCI)": "XXXXX",
+            "Michigan Department of Corrections (MDOC)": "XXXXX"
         },
     "Missouri":
         {
@@ -37,7 +30,6 @@ OVERRIDES = {
     "Utah":
         {
             "Weber": "49057",
-            "unassigned": "XXXXX",
         },
     "Virginia":
         {
@@ -62,7 +54,7 @@ OVERRIDE_COUNTIES_WITH_DATA = [
     '37095', '48501', '49001', '53023', '40149', '37173'
 ]
 IGNORED_COUNTIES = [
-    '80008', '80015', '80040',
+    '80008', '80013', '80015', '80040',
     '88888',
     '90001', '90002', '90004', '90005', '90006', '90008', '90009', '90010',
     '90012', '90013', '90015', '90016', '90017', '90018', '90019',
@@ -71,6 +63,6 @@ IGNORED_COUNTIES = [
     '90040', '90041', '90042', '90044', '90046', '90047', '90049', '90050',
     '90051', '90053', '90054', '90055',
     '99999',
-    '00066', '00072', '00078',
+    '66', '72', '78',
     'XXXXX'
 ]

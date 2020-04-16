@@ -76,6 +76,9 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
     used_overrides = []
 
     reader = csv.reader(lines, delimiter=',')
+
+    unpadded_fips_count = 0
+
     for row in reader:
         fips = row[0]
         county = row[1]
@@ -100,7 +103,8 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
 
             if fips is not None:
                 if len(fips) == 4:
-                    print("Fixing incorrect FIPS code, was '" + fips + "', fixing with '0" + fips + "'")
+                    # print("Fixing incorrect FIPS code, was '" + fips + "', fixing with '0" + fips + "'")
+                    unpadded_fips_count += 1
                     fips = '0' + fips
 
                 # last_update = row[4]
@@ -151,6 +155,9 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
     if len(overrides_without_data) > 0:
         print("WARNING: Counties flagged to ignore no data, but data found")
         print(overrides_without_data)
+
+    if unpadded_fips_count > 0:
+        print("Incorrect (missing leading zero) FIPS found for " + str(unpadded_fips_count) + " counties.")
 
     for state in overrides:
         state_overrides = overrides[state]
