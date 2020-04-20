@@ -6,20 +6,20 @@ FIELDS = [
     {'name': 'area_type', 'position': 2, 'include_metadata': False, 'include_history': False},
     {'name': 'population', 'position': 3, 'include_history': False},
     {'name': 'cases', 'position': 5, 'round_digits': 2},
-    {'name': 'cases_per_10k_people', 'position': 6, 'round_digits': 2},
+    {'name': 'cases_per_10k_people', 'position': 6, 'round_digits': 2, 'metadata_only': True},
     {'name': 'deaths', 'position': 7, },
     # {'name': 'recovered', 'position': 8, },
     # {'name': 'active', 'position': 9, },
-    {'name': 'increase', 'position': 10, },
+    {'name': 'increase', 'position': 10, 'metadata_only': True},
     {'name': 'hospitals', 'position': 11, 'include_history': False},
     {'name': 'hospital_beds', 'position': 12, 'include_history': False},
     {'name': 'icu_beds', 'position': 13, 'include_history': False},
-    {'name': 'cases_per_bed', 'position': 14, 'round_digits': 2},
-    {'name': 'cases_per_icu_bed', 'position': 15, 'round_digits': 2},
-    {'name': 'increase_per_10k_people', 'position': 16, 'round_digits': 3},
-    {'name': 'deaths_increase', 'position': 17},
-    {'name': 'deaths_per_10k_people', 'position': 18, 'round_digits': 3},
-    {'name': 'deaths_per_case', 'position': 19, 'round_digits': 4}
+    {'name': 'cases_per_bed', 'position': 14, 'round_digits': 2, 'metadata_only': True},
+    {'name': 'cases_per_icu_bed', 'position': 15, 'round_digits': 2, 'metadata_only': True},
+    {'name': 'increase_per_10k_people', 'position': 16, 'round_digits': 3, 'metadata_only': True},
+    {'name': 'deaths_increase', 'position': 17, 'metadata_only': True},
+    {'name': 'deaths_per_10k_people', 'position': 18, 'round_digits': 3, 'metadata_only': True},
+    {'name': 'deaths_per_case', 'position': 19, 'round_digits': 4, 'metadata_only': True}
 ]
 FILE_DATE_POSITION = 4
 
@@ -87,13 +87,15 @@ class DataTracker:
 
         for field in FIELDS:
             name = field['name']
-            if len(self.data) > 0 and name in self.data[0]:
-                properties[name] = self.data[0][name]
+            if not get_optional(field, 'metadata_only', False):
+                if len(self.data) > 0 and name in self.data[0]:
+                    properties[name] = self.data[0][name]
 
         for field in FIELDS:
             name = field['name']
             include_history = get_optional(field, 'include_history', True)
-            if include_history:
+            metadata_only = get_optional(field, 'metadata_only', False)
+            if include_history and not metadata_only:
                 history = []
                 stop = False
                 for position in range(1, len(self.data)):

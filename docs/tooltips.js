@@ -1,4 +1,10 @@
+/**
+ * Functions for working with our tooltip data popups.
+ */
 
+/**
+ * Generates a function that positions and displays data in the tooltip for a particular region.
+ */
 function getShowTooltipFunction() {
     let svg = d3.select('#map-content');
     let tooltip = d3.select("#tooltip");
@@ -40,6 +46,9 @@ function getShowTooltipFunction() {
     }
 }
 
+/**
+ * Hides the tooltip popup.
+ */
 function hideTooltipFunction(d) {
     d3.select("#tooltip")
         .transition()
@@ -47,35 +56,38 @@ function hideTooltipFunction(d) {
         .style("opacity", 0);
 }
 
+/**
+ * Adds the data to the tooltip for a specified region
+ *
+ * @param tooltip           The tooltip div.
+ * @param feature           The current region.
+ * @param backgroundColor   Background color for the tooltip.
+ */
 function addToolTipHTML(tooltip, feature, backgroundColor) {
     tooltip.select(".tooltip-header").html(feature.properties.area);
     tooltip.select(".tooltip-sub-header").html(feature.properties.area_type);
 
-    MapOptions.tooltipFields.forEach(function(field) {
-        let value = getToolTipFieldValue(feature, field);
+    for (field in FieldDetails) {
+        let value = FieldDetails[field].getFormattedFieldValue(feature);
         d3.select("#tooltip-value-" + field).html(value);
         d3.select("#tooltip-colorblock-" + field).style('background-color', getToolTipColorCell(feature, backgroundColor, field, value));
-    });
+    }
 
     return tooltip;
 }
 
-
-function getToolTipFieldValue(feature, field) {
-    let value = getFieldValueForDisplay(feature, field);
-    let fieldFormat = FieldDetails[field].format;
-    if (value != null && fieldFormat != null) {
-        value = d3.format(fieldFormat)(value);
-    } else if (value == null) {
-        value = '';
-    }
-    return value;
-}
-
+/**
+ * Generates a color icon cell for a particular field in the specified region.
+ *
+ * @param feature                   The current region.
+ * @param defaultBackgroundColor    Default background color, if none is specified by the data.
+ * @param field                     The field to display.
+ * @param value                     The current value of the field.
+ */
 function getToolTipColorCell(feature, defaultBackgroundColor, field, value) {
     let settings = FieldDetails[field];
     if (value != null && settings.colorScheme != null) {
-        return getColorMapFunction(field, settings)(feature);
+        return settings.getColorMapFunction()(feature);
     }
     return defaultBackgroundColor;
 }

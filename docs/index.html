@@ -195,6 +195,14 @@
                         <li>
                             <span class="font-weight-bold">Doubling Time (days):</span>
                             Indicates the number of days for the cases in a particular region to double, based on the last week.
+                            This metric is not calculated for regions that do not have enough historical data or for regions
+                            with less than 20 cases.
+                        </li>
+                        <li>
+                            <span class="font-weight-bold">Deaths / Case:</span>
+                            Provides the ratio of deaths to total cases.  This metric does not equate to a mortality rate,
+                            since active cases may result in additional deaths or recoveries, but is a relative approximation
+                            for comparing regions.  This metric is not calculated for areas that have less than 20 cases.
                         </li>
 
                     </ul>
@@ -393,10 +401,10 @@
             crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="map.js"></script>
     <script src="colors.js"></script>
+    <script src="fields.js"></script>
+    <script src="map.js"></script>
     <script src="controls.js"></script>
-    <script src="legend.js"></script>
     <script src="timeline.js"></script>
     <script src="tooltips.js"></script>
     <script>initializeMap();</script>

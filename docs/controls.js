@@ -1,4 +1,11 @@
+/**
+ * Functions related to handling various interactive controls in the HTML
+ * (field selector, timeline, URL parameters and state).
+ */
 
+/**
+ * Initializes the events for controls in the HTML.
+ */
 function initializeControls() {
     d3.select("#history-range")
         .on('change', function() {
@@ -16,22 +23,29 @@ function initializeControls() {
     };
 
     const urlParams = new URLSearchParams(window.location.search);
-    let field = urlParams.get('field');
-    if (FieldDetails[field] != null) {
-        fieldSelected(field, true, false);
+    let fieldId = urlParams.get('field');
+    if (FieldDetails[fieldId] != null) {
+        fieldSelected(fieldId, true, false);
     }
 }
 
-function fieldSelected(field, shouldChangeState = true, shouldUpdateMap = true) {
-    let settings = FieldDetails[field];
-    if (settings != null) {
+/**
+ * Respond to a change in selected field.
+ *
+ * @param fieldId           The identified for the new field.
+ * @param shouldChangeState Specifies whether we should update the window history state to reflect this change.
+ * @param shouldUpdateMap   Specifies whether we should update the map on this change.
+ */
+function fieldSelected(fieldId, shouldChangeState = true, shouldUpdateMap = true) {
+    let field = FieldDetails[fieldId];
+    if (field != null) {
         if (shouldChangeState) {
-            window.history.pushState({field: field}, document.title, "?field=" + field);
+            window.history.pushState({field: fieldId}, document.title, "?field=" + fieldId);
         }
-        d3.select('#field-button-' + MapOptions.currentField)
+        d3.select('#field-button-' + MapOptions.currentField.getFieldId())
             .classed("btn-primary", false)
             .classed("btn-secondary", true);
-        d3.select('#field-button-' + field)
+        d3.select('#field-button-' + fieldId)
             .classed("btn-primary", true)
             .classed("btn-secondary", false);
         MapOptions.currentField = field;
@@ -42,8 +56,4 @@ function fieldSelected(field, shouldChangeState = true, shouldUpdateMap = true) 
             }
         }
     }
-}
-
-function getCurrentSettings() {
-    return FieldDetails[MapOptions.currentField];
 }

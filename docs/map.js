@@ -1,35 +1,15 @@
-FieldDetails = {
-    area: {label: "Area/County", hasHistory: false},
-    area_type: {label: "Type", hasHistory: false},
-    cases: {label: "Total Cases", colorScheme: "Greys", format: ',d', logScaleColors: true, hasHistory: true},
-    deaths: {label: "Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true, hasHistory: true},
-    increase: {label: "New Cases Today", colorScheme: "RdPu", format: ',d', logScaleColors: true, hasHistory: true},
-    population: {label: "Population", colorScheme: "Greens", format: ',d', logScaleColors: true, forceColorMin: 50000, hasHistory: false},
-    cases_per_10k_people: {label: "Cases per 10,000 People", colorScheme: "Oranges", format: '.2f', logScaleColors: true, hasHistory: true},
-    increase_per_10k_people: {label: "New Cases per 10,000", colorScheme: "RdPu", format: '.2f', logScaleColors: true, hasHistory: true},
-    cases_per_bed: {label: "Cases per Hospital Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true, hasHistory: true},
-    cases_per_icu_bed: {label: "Cases per ICU Bed", colorScheme: "Reds", format: '.2f', logScaleColors: true, hasHistory: true},
-    hospitals: {label: "# of Hospitals", format: ',d', logScaleColors: true, hasHistory: false},
-    hospital_beds: {label: "# of Hospital Beds", format: ',d', logScaleColors: true, hasHistory: false},
-    icu_beds: {label: "# of ICU Beds", format: ',d', logScaleColors: true, hasHistory: false},
-    doubling: {label: "Doubling Time (days)", format: '.1f', logScaleColors: false, colorScheme: "custom-doubling", forceColorMax: 10, sortAscending: false, hasHistory: true},
-    deaths_increase: {label: "New Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true, hasHistory: true},
-    deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true, hasHistory: true},
-    providers: {label: "Healthcare Providers", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false},
-    all_healthcare_at_risk: {label: "Healthare Providers and Others at Risk", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false},
-    deaths_per_case: {label: "Deaths / Case", colorScheme: "Blues", format: '.4f', logScaleColors: true, hasHistory: true}
-};
-MapOptions = {
-    colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
-    fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'population', 'cases','providers','all_healthcare_at_risk'],
-    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling','providers','all_healthcare_at_risk','deaths_per_case'],
-    tableFields: ['area', 'cases', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'doubling', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed','hospitals','hospital_beds','icu_beds','population','providers','all_healthcare_at_risk'],
+/**
+ * Core functions for managing data and displaying the map.
+ */
 
+/**
+ * Holds settings and current data/state information for the map.
+ */
+MapOptions = {
     targetWidth: 1000,
     targetHeight: 600,
 
-    includeCounties: true,
-    currentField: 'cases_per_icu_bed',
+    currentField: FieldDetails.cases_per_icu_bed,
     lastUpdateDate: null,
     dateHistory: [],
 
@@ -42,6 +22,11 @@ MapOptions = {
     selectedAreaIds: []
 };
 
+/**
+ * Updates settings and data after the metadata is loaded.
+ *
+ * @param metadata  Metadata JSON loaded from the server.
+ */
 function updateMetadata(metadata) {
     MapOptions.lastUpdateDate = metadata.last_file_date;
     MapOptions.dateHistory = metadata.file_date_history;
@@ -57,20 +42,10 @@ function updateMetadata(metadata) {
     setTimelineRange(0, MapOptions.dateHistory.length);
 }
 
-function getFieldValueForDisplay(d, field) {
-    if (MapOptions.historyIndex >= 0 && FieldDetails[field].hasHistory) {
-        let history = d.properties[field + "_history"];
-        if (history == null) {
-            return null;
-        }
-        if (MapOptions.historyIndex >= history.length) {
-            return null;
-        }
-        return history[MapOptions.historyIndex];
-    }
-    return d.properties[field];
-}
-
+/**
+ * Draws an empty placeholder on the screen while we load the map data, so the rest of the page
+ * doesn't jump around when we are ready to display the map.
+ */
 function drawEmptyMapPlaceholder() {
     let svg = d3.select('#map-content')
         .append('div')
@@ -90,6 +65,12 @@ function drawEmptyMapPlaceholder() {
     return svg;
 }
 
+/**
+ * Callback used when a region is selected.  If we are on a page that uses this information, we
+ * update tracking and display details.
+ *
+ * @param d Data for the region that was clicked.
+ */
 function regionClicked(d) {
     if (MapOptions.showTables) {
         let id = d.properties.id;
@@ -104,6 +85,13 @@ function regionClicked(d) {
     }
 }
 
+/**
+ * Draws the map.
+ *
+ * @param svg       The SVG to draw in.
+ * @param geojson   Our core data (geographic areas and data)
+ * @param states    Geographic areas for state outlines, which we will draw on top of the counties/areas.
+ */
 function drawMap(svg, geojson, states) {
     let baseGroup = svg.append('g').classed('map-zoom-items', true);
     let g = baseGroup.append('g')
@@ -117,13 +105,13 @@ function drawMap(svg, geojson, states) {
 
     let geoPath = d3.geoPath().projection(albersProjection);
 
-    let settings = getCurrentSettings();
+    let field = MapOptions.currentField;
 
     g.selectAll('path')
         .data(geojson.features)
         .enter()
         .append('path')
-        .attr('fill', getColorMapFunction(MapOptions.currentField, settings))
+        .attr('fill', field.getColorMapFunction())
         .attr('stroke', '#bbb')
         .attr('stroke-width', 0.1)
         .attr('d', geoPath)
@@ -153,9 +141,16 @@ function drawMap(svg, geojson, states) {
         .attr('fill', 'none');
 
     setupZoomButtons(svg, baseGroup, zoom);
-    drawLegend(MapOptions.currentField, settings, baseGroup);
+    drawLegend(field, baseGroup);
 }
 
+/**
+ * Defines zoom controls for the map.
+ *
+ * @param svg       The SVG in which we are drawing the map.
+ * @param zoomArea  The area of the SVG that will be zoomed in and out.
+ * @param zoom      The D3 zoom object.
+ */
 function setupZoomButtons(svg, zoomArea, zoom) {
     let zoomControlGroup = svg.append('g')
         .classed('map-zoom-controls', true)
@@ -202,16 +197,23 @@ function setupZoomButtons(svg, zoomArea, zoom) {
         });
 }
 
+/**
+ * Updates the map (e.g. when field selections, timeline, or data have changed).
+ */
 function updateMap() {
-    let settings = getCurrentSettings();
+    let field = MapOptions.currentField;
     let svg = d3.select('.map-svg');
     svg.select('.map-areas').selectAll('path')
         .transition()
         .duration(750)
-        .attr('fill', getColorMapFunction(MapOptions.currentField, settings));
-    drawLegend(MapOptions.currentField, settings, svg);
+        .attr('fill', field.getColorMapFunction());
+    drawLegend(field, svg);
 }
 
+/**
+ * Stores our optional provider data (loaded separately from our core data)
+ * into our core data objects.
+ */
 function storeProviderData(providers) {
     MapOptions.allData.forEach(function(feature) {
         providerData = providers[feature.properties.id];
@@ -222,6 +224,12 @@ function storeProviderData(providers) {
     });
 }
 
+/**
+ * Initializes all of our map controls, loads data from the server, and draws the map/related controls.
+ *
+ * @param shouldDrawTables  If true, we are drawing data tables below the map (not used on all pages).
+ * @param loadProviderData  If true, we are also loading the optional provider data from the server.
+ */
 function initializeMap(shouldDrawTables = false, loadProviderData = false) {
     MapOptions.showTables = shouldDrawTables;
     MapOptions.loadProviderData = loadProviderData;
@@ -229,9 +237,6 @@ function initializeMap(shouldDrawTables = false, loadProviderData = false) {
     let svg = drawEmptyMapPlaceholder();
     const urlParams = new URLSearchParams(window.location.search);
     let metadataUrl = 'data/metadata.json';
-    if (urlParams.get('test') != null && urlParams.get('test') === 'true') {
-        metadataUrl = 'data/metadata-test.json'
-    }
 
     d3.json(metadataUrl, function (metadata) {
         updateMetadata(metadata);
