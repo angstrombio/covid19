@@ -26,7 +26,6 @@ function enableTables() {
         .data(MapOptions.tableFields)
         .enter()
         .append('th')
-        // TODO class
         .text(function(field) { return field.getLabel()});
 
     table.append('tbody').attr('id','county-table-body');
