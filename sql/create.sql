@@ -164,7 +164,6 @@ create view covid19.healthcare_msa as
     left outer join covid19.def_healthcare_data src on src.fips=mc.fips_stcou
     left outer join (select objectid, bed_utilization*num_licensed_beds as utilized_beds, num_licensed_beds as beds_to_combine from covid19.def_healthcare_data where bed_utilization is not null) as calc on src.objectid=calc.objectid
     group by msa.cbsa, msa.msa_name;
-
 create view covid19.cases_and_healthcare_historical_by_msa as (
     select CAST(msa.cbsa as VARCHAR) as GEOID,
         msa.cbsa as cbsa,
@@ -189,7 +188,8 @@ create view covid19.cases_and_healthcare_historical_by_msa as (
         case when hc.icu_beds is null or hc.icu_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.icu_beds end as cases_per_icu_bed,
         case when msa.pop_2018 is null then null else sum(cases_delta)::float/msa.pop_2018*10000 end as increase_per_10k_people,
         case when msa.pop_2018 is null then null else sum(cases.deaths)::float/msa.pop_2018*10000 end as deaths_per_10k_people,
-        sum(deaths_delta) as deaths_today
+        sum(deaths_delta) as deaths_today,
+        case when sum(cases.cases) < 20 then null else sum(cases.deaths)::float/sum(cases.cases) end as deaths_per_case
     from covid19.census_msa msa
         inner join covid19.census_msa_counties mc on msa.cbsa=mc.cbsa
         left outer join covid19.nyt_jhu_combined_derived cases on cases.fips=mc.fips_stcou
@@ -222,7 +222,8 @@ create view covid19.cases_and_healthcare_historical_by_county as (
         case when hc.icu_beds is null or hc.icu_beds=0 then null else (sum(cases.cases::float)-sum(cases.deaths))/hc.icu_beds end as cases_per_icu_bed,
         case when counties.pop_2018 is null then null else sum(cases_delta)::float/counties.pop_2018*10000 end as increase_per_10k_people,
         case when counties.pop_2018 is null then null else sum(cases.deaths)::float/counties.pop_2018*10000 end as deaths_per_10k_people,
-        sum(deaths_delta) as deaths_today
+        sum(deaths_delta) as deaths_today,
+        case when sum(cases.cases) < 20 then null else sum(cases.deaths)::float/sum(cases.cases) end as deaths_per_case
     from covid19.census counties
         inner join covid19.states states on counties.state=states.state_name
         left outer join covid19.nyt_jhu_combined_derived cases on cases.fips=counties.fips

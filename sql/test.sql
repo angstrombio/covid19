@@ -36,3 +36,10 @@ where jhu.fips != 'XXXXX' and jhu.fips < '80000'
 
 select file_date, count(*) from covid19.jhu group by file_date order by file_date;
 select * from covid19.cases_and_healthcare_historical_combined order by increase_per_10k_people asc limit 100;
+
+select * from covid19.census where state='Utah' and county in ('Weber County', 'Morgan County');
+
+select * from covid19.census_msa m 
+left outer join covid19.census_msa_counties c on m.cbsa=c.cbsa
+where msa_name like '%, UT';
+select * from covid19.census_msa_counties;

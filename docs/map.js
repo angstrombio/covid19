@@ -16,12 +16,13 @@ FieldDetails = {
     deaths_increase: {label: "New Deaths", colorScheme: "Blues", format: ',d', logScaleColors: true, hasHistory: true},
     deaths_per_10k_people: {label: "Deaths per 10,000", colorScheme: "Blues", format: '.2f', logScaleColors:true, hasHistory: true},
     providers: {label: "Healthcare Providers", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false},
-    all_healthcare_at_risk: {label: "Healthare Providers and Others at Risk", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false}
+    all_healthcare_at_risk: {label: "Healthare Providers and Others at Risk", colorScheme: 'YlGn', format: ',d', logScaleColors:true, hasHistory: false},
+    deaths_per_case: {label: "Deaths / Case", colorScheme: "Blues", format: '.4f', logScaleColors: true, hasHistory: true}
 };
 MapOptions = {
     colorSchemes: ['Blues', 'Greens', 'Greys', 'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn', 'BuPu', 'GnBu','OrRd', 'PuBuGn','PuBu','PuRd','RdPu','YlGnBu','YlGn','YlOrBr','YlOrRd','Rainbow','Sinebow'],
     fieldOptions: ['cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'population', 'cases','providers','all_healthcare_at_risk'],
-    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling','providers','all_healthcare_at_risk'],
+    tooltipFields: ['cases', 'increase', 'cases_per_10k_people', 'increase_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'hospitals', 'hospital_beds', 'icu_beds', 'population', 'doubling','providers','all_healthcare_at_risk','deaths_per_case'],
     tableFields: ['area', 'cases', 'cases_per_10k_people', 'increase', 'increase_per_10k_people', 'doubling', 'deaths', 'deaths_increase', 'deaths_per_10k_people', 'cases_per_icu_bed', 'cases_per_bed','hospitals','hospital_beds','icu_beds','population','providers','all_healthcare_at_risk'],
 
     targetWidth: 1000,

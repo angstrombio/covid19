@@ -19,6 +19,7 @@ FIELDS = [
     {'name': 'increase_per_10k_people', 'position': 16, 'round_digits': 3},
     {'name': 'deaths_increase', 'position': 17},
     {'name': 'deaths_per_10k_people', 'position': 18, 'round_digits': 3},
+    {'name': 'deaths_per_case', 'position': 19, 'round_digits': 4}
 ]
 FILE_DATE_POSITION = 4
 

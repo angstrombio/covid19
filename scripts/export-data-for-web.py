@@ -52,7 +52,7 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
                     file_date, cases, cases_per_10k_people, deaths, recovered, active,
                     increase_yesterday, num_hospitals, staffed_beds, icu_beds,  
                     cases_per_staffed_bed, cases_per_icu_bed, increase_per_10k_people,
-                    deaths_today, deaths_per_10k_people
+                    deaths_today, deaths_per_10k_people, deaths_per_case
                     FROM covid19.cases_and_healthcare_historical_combined WHERE file_date in (""" + all_dates_str + """) 
                      ORDER BY GEOID, file_date DESC""")
 
