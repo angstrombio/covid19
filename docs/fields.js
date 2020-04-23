@@ -272,6 +272,7 @@ class Field {
         let interpolator = this.colorInterpolator;
         let colorMin = (this.forceColorMin == null) ? 0 : this.forceColorMin;
         let colorMax = this.getLegendMax();
+        let rangeMax = colorMax;
 
         let logFunction = null;
         if (this.logScaleColors) {
@@ -284,7 +285,7 @@ class Field {
             colorMax = logFunction(colorMax);
         }
         return function(d) {
-            let value = (d/width * colorMax);
+            let value = (d/width * rangeMax);
             if (logFunction != null) {
                 value = logFunction(value);
             }
