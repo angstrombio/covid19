@@ -120,7 +120,9 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
                     counties_matched += 1
                     found_counties.append(fips)
                 else:
-                    if fips not in IGNORED_COUNTIES:
+                    # Ignore the made-up counties for "unassigned" data by state, in the range 80000 - 99999
+                    # Also ignore specific made-up counties for US territories, military, and cruise ships
+                    if (fips < '80000' or fips > '99999') and fips not in IGNORED_COUNTIES:
                         print("County details not found for FIPS=" + fips + ", " + state + " " + county)
 
             recovered = parse_number(row[9])

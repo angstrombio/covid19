@@ -28,18 +28,16 @@ OVERRIDES = {
 }
 
 OVERRIDE_COUNTIES_WITH_DATA = [
-    '37095', '49001', '53023', '40149', '37173'
+    '37095', '49001', '40149', '37173',
+    '49005',  # Utah county merged into public health authority region in source data.
+    '49013',  # Utah county merged into public health authority region in source data.
+    '49015',  # Utah county merged into public health authority region in source data.
+    '49017',  # Utah county merged into public health authority region in source data.
+    '49019',  # Utah county merged into public health authority region in source data.
+    '49021',  # Utah county merged into public health authority region in source data.
+    '49025',  # Utah county merged into public health authority region in source data.
 ]
 IGNORED_COUNTIES = [
-    '80008', '80013', '80015', '80026', '80040', '80047',
-    '88888',
-    '90001', '90002', '90004', '90005', '90006', '90008', '90009', '90010',
-    '90012', '90013', '90015', '90016', '90017', '90018', '90019',
-    '90020', '90021', '90022', '90023', '90024', '90025', '90026', '90027', '90028', '90029',
-    '90030', '90031', '90032', '90033', '90034', '90035', '90036', '90037', '90038', '90039',
-    '90040', '90041', '90042', '90044', '90046', '90047', '90049', '90050',
-    '90051', '90053', '90054', '90055', '90056',
-    '99999',
     '66', '69', '72', '78',
     'XXXXX'
 ]
