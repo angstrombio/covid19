@@ -28,7 +28,7 @@ OVERRIDES = {
 }
 
 OVERRIDE_COUNTIES_WITH_DATA = [
-    '49001', '37173',
+    '49001', 
     '49005',  # Utah county merged into public health authority region in source data.
     '49013',  # Utah county merged into public health authority region in source data.
     '49015',  # Utah county merged into public health authority region in source data.
