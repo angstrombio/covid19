@@ -24,14 +24,14 @@ function getShowTooltipFunction() {
             tooltipLeft = regionBoundingRect['x'] + regionBoundingRect['width'] + 5;
         } else {
             // Go left
-            tooltipLeft = regionBoundingRect['x'] - 250 - 5;
+            tooltipLeft = regionBoundingRect['x'] - 325 - 5;
         }
         if (regionBoundingRect['y'] < mapMidPointY) {
             // Go down
             tooltipTop = window.pageYOffset + regionBoundingRect['y'] + regionBoundingRect['height'] + 5;
         } else {
             // Go up
-            tooltipTop = window.pageYOffset + regionBoundingRect['y'] - 290 - 5;
+            tooltipTop = window.pageYOffset + regionBoundingRect['y'] - 225 - 5;
             // todo window.pagexoffset
         }
 
@@ -86,8 +86,8 @@ function addToolTipHTML(tooltip, feature, backgroundColor) {
  */
 function getToolTipColorCell(feature, defaultBackgroundColor, field, value) {
     let settings = FieldDetails[field];
-    if (value != null && settings.colorScheme != null) {
-        return settings.getColorMapFunction()(feature);
+    if (value != null && settings.colorInterpolator != null) {
+        return settings.getColorMapFunction(defaultBackgroundColor)(feature);
     }
     return defaultBackgroundColor;
 }

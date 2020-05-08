@@ -31,6 +31,9 @@ class Field {
         this.colorInterpolator = null;
         this.legendFormat = null;
         this.text = false;
+        this.useRawValuesForInterpolator = false;
+        this.legendValuesFunction = null;
+        this.useWideLegend = false;
     }
 
     /**
@@ -40,12 +43,14 @@ class Field {
      * @param logScaleColors    Specifies whether we will apply the color gradient on a log scale (defaults to true).
      * @param forceColorMin     Specifies a value to use at the minimum color, rather than 0.  Optional; defaults to not defined.
      * @param forceColorMax     Specifies a value to use at the maximum color, rather than the data max.  Optional; defaults to not defined.
+     * @param useRawValuesForInterpolator   Specifies to use raw values (rather than a percent of range) to pass to the color interpolator
      */
-    setColorScheme(colorInterpolator, logScaleColors = true, forceColorMin = null, forceColorMax = null) {
+    setColorScheme(colorInterpolator, logScaleColors = true, forceColorMin = null, forceColorMax = null, useRawValuesForInterpolator = false) {
         this.colorInterpolator = colorInterpolator;
         this.logScaleColors = logScaleColors;
         this.forceColorMin = forceColorMin;
         this.forceColorMax = forceColorMax;
+        this.useRawValuesForInterpolator = useRawValuesForInterpolator;
         return this;
     }
 
@@ -53,8 +58,8 @@ class Field {
      * Builder method to define an integer format for this field.  Data will be displayed with a
      * thousands-separator and no decimal places.
      */
-    setIntFormat() {
-        this.format = ',d';
+    setIntFormat(includeSign = false) {
+        this.format = (includeSign ? '+' : '') + ',d';
         return this;
     }
 
@@ -66,6 +71,11 @@ class Field {
      */
     setFloatFormat(numDigits = 2) {
         this.format = '.' + numDigits + 'f';
+        return this;
+    }
+
+    setPercentFormat(numDigits = 0, includeSign = false) {
+        this.format = (includeSign ? '+' : '') + '.' + numDigits + '%';
         return this;
     }
 
@@ -208,11 +218,22 @@ class Field {
     /**
      * Retrieves a function that maps values to colors for this field.
      */
-    getColorMapFunction() {
+    getColorMapFunction(colorForNoValue = '#ffffff') {
         if (this.colorInterpolator == null) {
             return null;
         }
+        let field = this;
         let interpolator = this.colorInterpolator;
+        if (this.useRawValuesForInterpolator) {
+            return function(d) {
+                let value = field.getFieldValue(d);
+                if (value == null || value == 0) {
+                    return colorForNoValue;
+                } else {
+                    return interpolator(value);
+                }
+            }
+        }
         let logFunction = null;
         if (this.logScaleColors) {
             logFunction = function(value) {
@@ -227,11 +248,10 @@ class Field {
             }
             max = logFunction(max)
         }
-        let field = this;
         return function(d) {
             let value = field.getFieldValue(d);
             if (value == null || value == 0) {
-                return "#ffffff";
+                return colorForNoValue;
             } else {
                 if (logFunction != null) {
                     if (value <= 0) {
@@ -270,9 +290,12 @@ class Field {
      */
     getLegendColorFunction(width) {
         let interpolator = this.colorInterpolator;
+        let useRawValues = this.useRawValuesForInterpolator;
         let colorMin = (this.forceColorMin == null) ? 0 : this.forceColorMin;
         let colorMax = this.getLegendMax();
+        let rangeMin = (useRawValues ? this.forceColorMin : 0);
         let rangeMax = colorMax;
+
 
         let logFunction = null;
         if (this.logScaleColors) {
@@ -285,12 +308,14 @@ class Field {
             colorMax = logFunction(colorMax);
         }
         return function(d) {
-            let value = (d/width * rangeMax);
+            let value = (d/width * (rangeMax - rangeMin)) + rangeMin;
             if (logFunction != null) {
                 value = logFunction(value);
             }
             let pct;
-            if (value < colorMin) {
+            if (useRawValues) {
+                pct = value;
+            } else if (value < colorMin) {
                 pct = 0;
             } else if (value > colorMax) {
                 pct = 1;
@@ -325,6 +350,24 @@ class Field {
     isText() {
         return this.text;
     }
+
+    setLegendValuesFunction(f) {
+        this.legendValuesFunction = f;
+        return this;
+    }
+
+    getLegendValuesFunction() {
+        return this.legendValuesFunction;
+    }
+
+    getUseWideLegend() {
+        return this.useWideLegend;
+    }
+
+    setUseWideLegend(value) {
+        this.useWideLegend = value;
+        return this;
+    }
 }
 
 /**
@@ -339,17 +382,16 @@ FieldDetails = {
     hospitals: new Field('hospitals',"# of Hospitals").setIntFormat().setNoHistory(),
     hospital_beds: new Field('hospital_beds',"# of Hospital Beds").setIntFormat().setNoHistory(),
     icu_beds: new Field('icu_beds',"# of ICU Beds").setIntFormat().setNoHistory(),
-    doubling: new Field('doubling',"Doubling Time (days)").setFloatFormat(1).setColorScheme(interpolateCaseDoubling, false, null, 10).setSortAscending(false),
-    providers: new Field('providers',"Healthcare Providers").setColorScheme(d3.interpolateYlGn).setIntFormat().setNoHistory(),
-    all_healthcare_at_risk: new Field('all_healthcare_at_risk',"Healthare Providers and Others at Risk").setColorScheme(d3.interpolateYlGn).setIntFormat().setNoHistory(),
+    new_rate_change: new Field('new_rate_change', 'Change in New Cases in the Past Week').setPercentFormat(0, true)
+        .setColorScheme(interpolateNewCaseRateChange, false, -1, 1, true).setLegendFormat('+.0%').setLegendValuesFunction(getNewCaseLegendValues).setUseWideLegend(true),
 };
 
 // Now add calculated fields
-FieldDetails.increase = new Field('increase',"New Cases Today").setColorScheme(d3.interpolateRdPu).setIntFormat().setIncreaseDataFunction(FieldDetails.cases);
+FieldDetails.increase = new Field('increase',"New Cases Today").setColorScheme(d3.interpolateRdPu).setIntFormat(true).setIncreaseDataFunction(FieldDetails.cases);
 FieldDetails.cases_per_10k_people = new Field('cases_per_10k_people',"Cases per 10,000 People").setColorScheme(d3.interpolateOranges).setFloatFormat(2).setRatioDataFunction(FieldDetails.cases, FieldDetails.population, true);
 FieldDetails.increase_per_10k_people = new Field('increase_per_10k_people',"New Cases per 10,000").setColorScheme(d3.interpolateRdPu).setFloatFormat(2).setRatioDataFunction(FieldDetails.increase, FieldDetails.population, true);
 FieldDetails.cases_per_bed = new Field('cases_per_bed',"Cases per Hospital Bed").setColorScheme(d3.interpolateReds).setFloatFormat(2).setRatioDataFunction(FieldDetails.cases, FieldDetails.hospital_beds);
 FieldDetails.cases_per_icu_bed = new Field('cases_per_icu_bed',"Cases per ICU Bed").setColorScheme(d3.interpolateReds).setFloatFormat(2).setRatioDataFunction(FieldDetails.cases, FieldDetails.icu_beds);
-FieldDetails.deaths_increase = new Field('deaths_increase',"New Deaths").setColorScheme(d3.interpolateBlues).setIntFormat().setIncreaseDataFunction(FieldDetails.deaths);
+FieldDetails.deaths_increase = new Field('deaths_increase',"New Deaths").setColorScheme(d3.interpolateBlues).setIntFormat(true).setIncreaseDataFunction(FieldDetails.deaths);
 FieldDetails.deaths_per_10k_people = new Field('deaths_per_10k_people', "Deaths per 10,000").setColorScheme(d3.interpolateBlues).setFloatFormat(2).setRatioDataFunction(FieldDetails.deaths, FieldDetails.population, true);
-FieldDetails.deaths_per_case = new Field('deaths_per_case',"Deaths / Case").setColorScheme(d3.interpolateBlues).setFloatFormat(4).setRatioDataFunction(FieldDetails.deaths, FieldDetails.cases, false, 19).setLegendFormat('.2f');
+FieldDetails.deaths_per_case = new Field('deaths_per_case',"Deaths / Case").setColorScheme(d3.interpolateBlues).setPercentFormat(2).setRatioDataFunction(FieldDetails.deaths, FieldDetails.cases, false, 19).setLegendFormat('.2f');

@@ -9,7 +9,7 @@ MapOptions = {
     targetWidth: 1000,
     targetHeight: 600,
 
-    currentField: FieldDetails.cases_per_icu_bed,
+    currentField: FieldDetails.increase_per_10k_people,
     lastUpdateDate: null,
     dateHistory: [],
 
@@ -17,7 +17,6 @@ MapOptions = {
 
     allData: null,
     showTables: false,
-    loadProviderData: false,
     tablesShowSelections: false,
     selectedAreaIds: []
 };
@@ -211,28 +210,12 @@ function updateMap() {
 }
 
 /**
- * Stores our optional provider data (loaded separately from our core data)
- * into our core data objects.
- */
-function storeProviderData(providers) {
-    MapOptions.allData.forEach(function(feature) {
-        providerData = providers[feature.properties.id];
-        if (providerData) {
-            feature.properties.providers = providerData.providers;
-            feature.properties.all_healthcare_at_risk = providerData.all_healthcare_at_risk
-        }
-    });
-}
-
-/**
  * Initializes all of our map controls, loads data from the server, and draws the map/related controls.
  *
  * @param shouldDrawTables  If true, we are drawing data tables below the map (not used on all pages).
- * @param loadProviderData  If true, we are also loading the optional provider data from the server.
  */
-function initializeMap(shouldDrawTables = false, loadProviderData = false) {
+function initializeMap(shouldDrawTables = false) {
     MapOptions.showTables = shouldDrawTables;
-    MapOptions.loadProviderData = loadProviderData;
     initializeControls();
     let svg = drawEmptyMapPlaceholder();
     const urlParams = new URLSearchParams(window.location.search);
@@ -243,17 +226,10 @@ function initializeMap(shouldDrawTables = false, loadProviderData = false) {
         d3.json('data/' + MapOptions.lastUpdateDate + '-cases-healthcare-history.geojson', function (geojson) {
             MapOptions.allData = geojson.features;
             d3.json('data/states.geojson', function(states) {
-                if (loadProviderData) {
-                    d3.json('data/providers.json', function(providers) {
-                        storeProviderData(providers);
-                        drawMap(svg, geojson, states);
-                        if (MapOptions.showTables) {
-                            enableTables();
-                            updateTable();
-                        }
-                    })
-                } else {
-                    drawMap(svg, geojson, states);
+                drawMap(svg, geojson, states);
+                if (MapOptions.showTables) {
+                    enableTables();
+                    updateTable();
                 }
             });
         });

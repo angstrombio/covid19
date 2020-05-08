@@ -33,7 +33,6 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
         output_geojsonfile = os.path.join(output_folder, file_date + '-cases-healthcare-history.geojson')
         stateoutput_geojsonfile = os.path.join(output_folder, 'states.geojson')
         output_metadatafile = os.path.join(output_folder, 'metadata.json')
-        output_providers = os.path.join(output_folder, 'providers.json')
 
         if not overwrite and os.path.exists(output_geojsonfile):
             print("ERROR: File exists, overwrite not specified")
@@ -93,9 +92,6 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
         areas.save(output_geojsonfile)
         state_outlines.save(stateoutput_geojsonfile)
 
-        print("Extracting Provider Data")
-        export_providers(db, output_providers, metadata)
-
         print("Saving Metadata")
         with open(output_metadatafile, "w") as metadata_file:
             json.dump(metadata, metadata_file)
@@ -131,28 +127,6 @@ def get_file_dates(db, metadata):
         metadata['file_date_history'] = date_history
 
         return current_date, date_history, all_dates_str
-
-
-def export_providers(db, providers_jsonfile, metadata):
-    with db.cursor() as cursor:
-        cursor.execute("SELECT geoid, num_providers, num_other_at_risk FROM covid19.bls_providers_combined")
-
-        metadata['providers'] = {'min': 0, 'max': 0}
-        metadata['all_healthcare_at_risk'] = {'min': 0, 'max': 0}
-        all_providers = {}
-        for row in cursor.fetchall():
-            geoid = row[0]
-            providers = row[1]
-            total = row[1] + row[2]
-            all_providers[geoid] = {"providers": providers, "all_healthcare_at_risk": total}
-
-            if providers > metadata['providers']['max']:
-                metadata['providers']['max'] = providers
-            if total > metadata['all_healthcare_at_risk']['max']:
-                metadata['all_healthcare_at_risk']['max'] = total
-
-    with open(providers_jsonfile, "w") as providers_file:
-        json.dump(all_providers, providers_file)
 
 
 # Main part of the script: just examine/verify command line and invoke our loader

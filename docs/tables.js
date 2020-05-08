@@ -9,10 +9,10 @@ function enableTables() {
     MapOptions.showTables = true;
     MapOptions.tableFields = [
         FieldDetails.area, FieldDetails.cases, FieldDetails.cases_per_10k_people, FieldDetails.increase,
-        FieldDetails.increase_per_10k_people, FieldDetails.doubling, FieldDetails.deaths, FieldDetails.deaths_increase,
+        FieldDetails.increase_per_10k_people, FieldDetails.new_rate_change, FieldDetails.deaths, FieldDetails.deaths_increase,
         FieldDetails.deaths_per_10k_people, FieldDetails.deaths_per_case, FieldDetails.cases_per_icu_bed,
         FieldDetails.cases_per_bed, FieldDetails.hospitals, FieldDetails.hospital_beds, FieldDetails.icu_beds,
-        FieldDetails.population, FieldDetails.providers, FieldDetails.all_healthcare_at_risk, ];
+        FieldDetails.population, ];
 
     let table = d3.select("#county-tables")
         .append('small')

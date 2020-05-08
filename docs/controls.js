@@ -26,6 +26,8 @@ function initializeControls() {
     let fieldId = urlParams.get('field');
     if (FieldDetails[fieldId] != null) {
         fieldSelected(fieldId, true, false);
+    } else {
+        fieldSelected(MapOptions.currentField.getFieldId(), false, false);
     }
 }
 

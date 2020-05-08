@@ -211,8 +211,6 @@ def clear_all_data(db):
 
 def refresh_mv(db):
     with db.cursor() as cursor:
-        print("Refreshing materialized view (JHU)")
-        cursor.execute("REFRESH MATERIALIZED VIEW covid19.jhu_derived")
         print("Refreshing materialized view (Combined)")
         cursor.execute("REFRESH MATERIALIZED VIEW covid19.nyt_jhu_combined_derived")
 

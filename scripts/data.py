@@ -1,4 +1,3 @@
-import math
 from datetime import datetime, timedelta
 
 FIELDS = [
@@ -83,7 +82,7 @@ class DataTracker:
 
     def to_properties(self):
         properties = {'id': self.area_id}
-        doubling_data = self._calculate_doubling_rates()
+        daily_new_rate_change = self._calculate_daily_new_rate_change()
 
         for field in FIELDS:
             name = field['name']
@@ -107,36 +106,49 @@ class DataTracker:
                 if len(history) > 0:
                     properties[name + '_history'] = history
 
-        if doubling_data is not None and len(doubling_data) > 0:
-            properties['doubling'] = doubling_data[0]
-            if len(doubling_data) > 1:
-                properties['doubling_history'] = doubling_data[1:len(doubling_data)]
+        if daily_new_rate_change is not None and len(daily_new_rate_change) > 0:
+            properties['new_rate_change'] = daily_new_rate_change[0]
+            if len(daily_new_rate_change) > 1:
+                properties['new_rate_change_history'] = daily_new_rate_change[1:len(daily_new_rate_change)]
 
         return properties
 
-    def _calculate_doubling_rates(self):
-        # Calculate growth rate as # days the number is doubling over the last week
-        # growth rate = (log(cases) - log(cases 7 days ago)/log(2)  ---- # of doubling in the last week
-        # doubling = 7/growth rate (# of days to double)
-        # Like NYT, only calculate when we have 7 days of data and cases > 20
-        doubling_rates = []
+    def _calculate_daily_new_rate_change(self):
+        # Calculate the average daily new cases over the last 7 days,
+        # then over the 7 days before that, and calculate the rate of change
+        rate_changes = []
         for position in range(0, len(self.data)):
             position_1week_back = self._get_index_1week_back(position)
             if position_1week_back is None or position_1week_back >= len(self.data):
-                # Stop and return what we have
-                return doubling_rates
-            else:
-                cases_current = self.data[position]['cases']
-                cases_1week = self.data[position_1week_back]['cases']
-                if cases_current < 20 or cases_1week == 0 or cases_current == cases_1week:
-                    # Stop and return what we have
-                    return doubling_rates
-                else:
-                    growth_rate_1wk = (math.log(cases_current) - math.log(cases_1week)) / math.log(2)
-                    doubling = 7 / growth_rate_1wk
-                    doubling_rates.append(round(doubling, 1))
+                # not enough data
+                return rate_changes
+            position_2weeks_back = self._get_index_1week_back(position_1week_back)
+            if position_2weeks_back is None or position_2weeks_back >= len(self.data):
+                # not enough data, but we'll mark this as +100%
+                rate_changes.append(1.00)
+                return rate_changes
+            current_avg = self._calculate_average_new_cases(position, position_1week_back-1, )
+            prior_avg = self._calculate_average_new_cases(position_1week_back, position_2weeks_back-1)
+            if prior_avg is None or current_avg is None or prior_avg < 1:
+                # not enough data
+                return rate_changes
 
-        return doubling_rates
+            rate_change = round((current_avg / prior_avg) - 1, 2)
+            rate_changes.append(rate_change)
+        return rate_changes
+
+    def _calculate_average_new_cases(self, range_start, range_end):
+        count = 0
+        total = 0
+        for position in range(range_start, range_end+1):
+            count += 1
+            increase = self.data[position]['increase']
+            total += increase
+
+        if count > 0:
+            return total / count
+        else:
+            return None
 
     def _get_index_1week_back(self, current_position):
         current_date = datetime.strptime(self.expected_dates[current_position], '%Y-%m-%d')

@@ -3,26 +3,32 @@
  * legends for that color coding.
  */
 
-/**
- * Custom color scheme for the "doubling" data field.  We use a
- * reverse scheme with several fixed points that color changes,
- * similar to the NYT analysis.
- *
- * @param data  The doubling rate value.
- */
-function interpolateCaseDoubling(data) {
-    if (data < 0.001) {
-        return "#ffffff";
+
+function interpolateNewCaseRateChange(data) {
+    if (data == null) {
+        return '#ffffff';
     }
-    if (data <= 0.3) {
-        return d3.interpolateOranges(0.8);
-    } else if (data <= 0.5) {
-        return d3.interpolateOranges(0.5);
-    } else if (data <= 0.7) {
-        return d3.interpolateOranges(0.25);
+    if (data > 0.5) {
+        return d3.interpolateReds(0.75);
+    } else if (data > 0.1) {
+        return d3.interpolateReds(0.25);
+    } else if (data > -0.1) {
+        return d3.interpolateGreys(0.2);
+    } else if (data > -0.5) {
+        return d3.interpolateGreens(0.25);
     } else {
-        return d3.interpolateOranges(0.1);
+        return d3.interpolateGreens(0.75);
     }
+}
+
+function getNewCaseLegendValues(xOffset, yOffset, height, legendFormat) {
+    let yLocation = yOffset + height + 10;
+    return [
+        {"value": -0.5, 'x': xOffset + 42, 'y': yLocation, 'format': legendFormat},
+        {"value": -0.1, 'x': xOffset + 78, 'y': yLocation, 'format': legendFormat},
+        {"value": 0.1, 'x': xOffset + 102, 'y': yLocation, 'format': legendFormat},
+        {"value": 0.5, 'x': xOffset + 140, 'y': yLocation, 'format': legendFormat},
+    ];
 }
 
 /**
@@ -52,36 +58,50 @@ function drawLegend(field, svg) {
     }
 
     let width = 100;
-    let height = 10;
     let xOffset = 450;
+    let xOffsetLegend = xOffset;
+    if (field.getUseWideLegend()) {
+        width = 200;
+        xOffsetLegend = xOffset - 50;
+    }
+    let height = 10;
     let yOffset = 30;
 
     let rangeMax = field.getLegendMax();
     let colorData = [...Array(width).keys()];
-    let rect = svgLegendGroup.selectAll('rect');
-    let merged = rect.data(colorData)
+    let rect = svgLegendGroup.selectAll('rect').data(colorData);
+    let merged = rect
         .enter()
         .append('rect')
         .attr('width', 2)
         .attr('height', height)
-        .attr('x', function(d) { return xOffset + d; })
+        .merge(rect)
+        .attr('x', function(d) { return xOffsetLegend + d; })
         .attr('y', yOffset)
-        .merge(rect);
-    merged.transition(750)
+        .transition(750)
         .attr('fill', field.getLegendColorFunction(width));
-    merged.exit().remove();
+    rect.exit().remove();
 
-    let bounds = [{"value": 0, "x": xOffset - 8, "format": ',d'}, {"value": rangeMax, "x": xOffset+width+3, "format": field.getLegendFormat()}];
-    let labels = svgLegendGroup.selectAll('.legend-text');
-    labels.data(bounds)
-        .enter()
+    let legendFormat = field.getLegendFormat();
+    let bounds = [
+        {"value": 0, "x": xOffsetLegend - 8, 'y': yOffset + height - 2, "format": ',d'},
+        {"value": rangeMax, "x": xOffsetLegend + width + 3, 'y': yOffset + height - 2, "format": legendFormat}];
+    let legendValuesFunction = field.getLegendValuesFunction();
+    if (legendValuesFunction != null) {
+        bounds = legendValuesFunction(xOffsetLegend, yOffset, height, legendFormat);
+    }
+
+    let labels = svgLegendGroup.selectAll('.legend-text').data(bounds);
+    labels.enter()
         .append('text')
         .classed('legend-text', true)
-        .attr('y', yOffset + height - 2)
         .merge(labels)
-        .attr('x', function(d) { return d.x })
-        .text(function(d) { return d3.format(d.format)(d.value) })
-        .exit().remove();
+        .attr('x', function (d) { return d.x;  })
+        .attr('y', function(d) { return d.y; })
+        .text(function (d) {
+            return d3.format(d.format)(d.value)
+        });
+    labels.exit().remove();
 
     let legendLabel = svgLegendGroup.selectAll('.legend-label');
     if (legendLabel.empty()) {
