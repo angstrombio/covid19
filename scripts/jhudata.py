@@ -19,7 +19,6 @@ OVERRIDES = {
     "Utah":
         {
             "Bear River": "49003",  # TODO Better mappings
-            "Southwest Utah": "49053",  # TODO Better mappings
             "Southeast Utah": "49007",  # TODO Better mappings
             "Central Utah": "49039",  # TODO Better mappings
             "TriCounty": "49047",  # TODO Better mappings

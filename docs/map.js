@@ -9,7 +9,7 @@ MapOptions = {
     targetWidth: 1000,
     targetHeight: 600,
 
-    currentField: FieldDetails.increase_per_10k_people,
+    currentField: FieldDetails.new_rate_change,
     lastUpdateDate: null,
     dateHistory: [],
 
