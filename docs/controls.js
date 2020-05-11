@@ -50,6 +50,8 @@ function fieldSelected(fieldId, shouldChangeState = true, shouldUpdateMap = true
         d3.select('#field-button-' + fieldId)
             .classed("btn-primary", true)
             .classed("btn-secondary", false);
+        let dropdownLabel = $('#field-selector-' + field.getFieldId()).text();
+        $('#field-selector-dropdown').text(dropdownLabel);
         MapOptions.currentField = field;
         if (shouldUpdateMap) {
             updateMap();

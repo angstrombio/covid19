@@ -106,6 +106,8 @@ function drawMap(svg, geojson, states) {
 
     let field = MapOptions.currentField;
 
+    let tooltipChartSvg = createTooltipChartSVG();
+
     g.selectAll('path')
         .data(geojson.features)
         .enter()
@@ -114,7 +116,7 @@ function drawMap(svg, geojson, states) {
         .attr('stroke', '#bbb')
         .attr('stroke-width', 0.1)
         .attr('d', geoPath)
-        .on("mouseover", getShowTooltipFunction())
+        .on("mouseover", getShowTooltipFunction(tooltipChartSvg))
         .on("mouseout",  hideTooltipFunction)
         .on("click", regionClicked);
 

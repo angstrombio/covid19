@@ -218,11 +218,16 @@ class Field {
     /**
      * Retrieves a function that maps values to colors for this field.
      */
-    getColorMapFunction(colorForNoValue = '#ffffff') {
+    getColorMapFunction(colorForNoValue = '#ffffff', valueRetrievalFunction = null) {
         if (this.colorInterpolator == null) {
             return null;
         }
         let field = this;
+        if (valueRetrievalFunction == null) {
+            valueRetrievalFunction = function(d) {
+                return field.getFieldValue(d);
+            }
+        }
         let interpolator = this.colorInterpolator;
         if (this.useRawValuesForInterpolator) {
             return function(d) {
@@ -248,8 +253,8 @@ class Field {
             }
             max = logFunction(max)
         }
-        return function(d) {
-            let value = field.getFieldValue(d);
+        return function(d, i) {
+            let value = valueRetrievalFunction(d, i);
             if (value == null || value == 0) {
                 return colorForNoValue;
             } else {
@@ -280,6 +285,10 @@ class Field {
         if (this.forceColorMax != null) {
             return this.forceColorMax;
         }
+        return this.dataMax;
+    }
+
+    getDataMax() {
         return this.dataMax;
     }
 
@@ -389,7 +398,7 @@ FieldDetails = {
 // Now add calculated fields
 FieldDetails.increase = new Field('increase',"New Cases Today").setColorScheme(d3.interpolateRdPu).setIntFormat(true).setIncreaseDataFunction(FieldDetails.cases);
 FieldDetails.cases_per_10k_people = new Field('cases_per_10k_people',"Cases per 10,000 People").setColorScheme(d3.interpolateOranges).setFloatFormat(2).setRatioDataFunction(FieldDetails.cases, FieldDetails.population, true);
-FieldDetails.increase_per_10k_people = new Field('increase_per_10k_people',"New Cases per 10,000").setColorScheme(d3.interpolateRdPu).setFloatFormat(2).setRatioDataFunction(FieldDetails.increase, FieldDetails.population, true);
+FieldDetails.increase_per_10k_people = new Field('increase_per_10k_people',"New Cases per 10,000").setColorScheme(d3.interpolateRdPu, true, null, 25).setFloatFormat(2).setRatioDataFunction(FieldDetails.increase, FieldDetails.population, true);
 FieldDetails.cases_per_bed = new Field('cases_per_bed',"Cases per Hospital Bed").setColorScheme(d3.interpolateReds).setFloatFormat(2).setRatioDataFunction(FieldDetails.cases, FieldDetails.hospital_beds);
 FieldDetails.cases_per_icu_bed = new Field('cases_per_icu_bed',"Cases per ICU Bed").setColorScheme(d3.interpolateReds).setFloatFormat(2).setRatioDataFunction(FieldDetails.cases, FieldDetails.icu_beds);
 FieldDetails.deaths_increase = new Field('deaths_increase',"New Deaths").setColorScheme(d3.interpolateBlues).setIntFormat(true).setIncreaseDataFunction(FieldDetails.deaths);

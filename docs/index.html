@@ -58,18 +58,36 @@
             <div class="container">
                 <div class="row">
                     <div class="d-flex align-items-center col-sm justify-content-center">
-                        <span class="font-weight-bold">Click to Select a Layer: </span>
-                    </div>
-                </div>
+                        <span class="font-weight-bold">Click to Select a Layer: &nbsp;&nbsp;</span>
+                        <div class="dropdown d-md-none">
+                            <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" id="field-selector-dropdown" aria-haspopup="true" aria-expanded="false">
+                                Label Goes Here
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="field-selector-dropdown" id="field-selector-options">
+                                <a class="dropdown-item field-selector-item" id="field-selector-increase" onClick="fieldSelected('increase');"><small>New Cases</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-new_rate_change" onClick="fieldSelected('new_rate_change');"><small>Change in New Cases</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-cases_per_10k_people" onClick="fieldSelected('cases_per_10k_people');"><small>Cases per 10,000</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-increase_per_10k_people" onClick="fieldSelected('increase_per_10k_people');"><small>New Cases per 10,000</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-cases" onClick="fieldSelected('cases');"><small>Total Cases</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-cases_per_icu_bed" onClick="fieldSelected('cases_per_icu_bed');"><small>Cases per ICU Bed</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-deaths" onClick="fieldSelected('deaths');"><small>Deaths</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-deaths_increase" onClick="fieldSelected('deaths_increase');"><small>New Deaths</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-deaths_per_10k_people" onClick="fieldSelected('deaths_per_10k_people');"><small>Deaths per 10,000</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-deaths_per_case" onClick="fieldSelected('deaths_per_case');"><small>Deaths / Case</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-population" onClick="fieldSelected('population');"><small>Population</small></a>
+                            </div>
+                        </div>
+                                            </div>
 
-                <div class="row d-flex justify-content-center text-nowrap">
+                </div>
+                <div class="row d-none d-md-flex justify-content-center text-nowrap">
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-increase" onclick="fieldSelected('increase');">New Cases</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-new_rate_change" onclick="fieldSelected('new_rate_change');">Change in New Cases</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-cases_per_10k_people" onclick="fieldSelected('cases_per_10k_people');">Cases per 10,000</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-increase_per_10k_people" onclick="fieldSelected('increase_per_10k_people');">New Cases per 10,000</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-cases" onclick="fieldSelected('cases');">Total Cases</button>
                 </div>
-                <div class="row d-flex justify-content-center text-nowrap">
+                <div class="row d-none d-md-flex justify-content-center text-nowrap">
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-cases_per_icu_bed" onclick="fieldSelected('cases_per_icu_bed');">Cases per ICU Bed</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths" onclick="fieldSelected('deaths');">Deaths</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_increase" onclick="fieldSelected('deaths_increase');">New Deaths</button>
@@ -77,31 +95,31 @@
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_per_case" onclick="fieldSelected('deaths_per_case');">Deaths / Case</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-population" onclick="fieldSelected('population');">Population</button>
                 </div>
-                        <div class="container-fluid py-2">
-                            <div class="row">
-                                <div class="col-sm"></div>
-                                <div class="d-flex">
-                                    <small><span class="font-weight-bold">Date:</span> <span id="history-range-label"></span></small>
-                                </div>
-                                <div class="col-sm"></div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm"></div>
-                                <div class="d-flex align-items-center col-sm justify-content-center">
-                                    <input type="range" id="history-range" class="slider custom-range" style="width: 100%">
-                                    <button type="button" class="btn btn-default" aria-label="Animate" onclick="triggerTimelineAnimation()">
-                                        <i id="play-button-icon" class="fa fa-play"></i>
-                                    </button>
-                                </div>
-                                <div class="col-sm"></div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm"></div>
-                                <div class="d-flex">
-                                    <small><i>Move slider or click play to see values over time</i></small>
-                                </div>
-                                <div class="col-sm"></div>
-                            </div>
+                <div class="container-fluid py-2">
+                    <div class="row justify-content-center ">
+                        <div class="col-sm"></div>
+                        <div class="d-flex">
+                            <small><span class="font-weight-bold">Date:</span> <span id="history-range-label"></span></small>
+                        </div>
+                        <div class="col-sm"></div>
+                    </div>
+                    <div class="row justify-content-center ">
+                        <div class="col-sm"></div>
+                        <div class="d-flex align-items-center col-sm justify-content-center">
+                            <input type="range" id="history-range" class="slider custom-range" style="width: 100%">
+                            <button type="button" class="btn btn-default" aria-label="Animate" onclick="triggerTimelineAnimation()">
+                                <i id="play-button-icon" class="fa fa-play"></i>
+                            </button>
+                        </div>
+                        <div class="col-sm"></div>
+                    </div>
+                    <div class="row justify-content-center ">
+                        <div class="col-sm"></div>
+                        <div class="d-flex">
+                            <small><i>Move slider or click play to see values over time</i></small>
+                        </div>
+                        <div class="col-sm"></div>
+                    </div>
                 </div>
             </div>
             <div class="container-fluid py-4">
@@ -297,6 +315,7 @@
                 <h3 class="text-heading">Change History</h3>
                 <div class="py-2 text-content">
                     <ul>
+                        <li>2020-05-11: Changed field controls on mobile devices for ease of use.  Added historical new case data charts to tooltips.</li>
                         <li>2020-05-07: Removed doubling rate; added change in new case rates.  Adjusted display of tooltips and default fields for ease of use.</li>
                         <li>2020-04-19: Added deaths per case metric</li>
                         <li>2020-04-09: Added zoom support on the map</li>
@@ -362,6 +381,14 @@
                     <tr>
                         <td class="tooltip-label-cell text-nowrap">Population: </td>
                         <td class="tooltip-value-cell text-nowrap" id="tooltip-value-population" colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td class="tooltip-newcase-chart-cell" colspan="3">
+                            <div class="tooltip-svg-container" id="tooltip-newcase-chart"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tooltip-chart-label-cell text-nowrap" colspan="3">Daily New Cases </td>
                     </tr>
                 </table>
             </div>

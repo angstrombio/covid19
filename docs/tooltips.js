@@ -5,7 +5,7 @@
 /**
  * Generates a function that positions and displays data in the tooltip for a particular region.
  */
-function getShowTooltipFunction() {
+function getShowTooltipFunction(tooltipCharSvg) {
     let svg = d3.select('#map-content');
     let tooltip = d3.select("#tooltip");
 
@@ -31,7 +31,7 @@ function getShowTooltipFunction() {
             tooltipTop = window.pageYOffset + regionBoundingRect['y'] + regionBoundingRect['height'] + 5;
         } else {
             // Go up
-            tooltipTop = window.pageYOffset + regionBoundingRect['y'] - 225 - 5;
+            tooltipTop = window.pageYOffset + regionBoundingRect['y'] - 265 - 5;
             // todo window.pagexoffset
         }
 
@@ -43,6 +43,7 @@ function getShowTooltipFunction() {
         addToolTipHTML(tooltip, d, backgroundColor)
             .style('left', tooltipLeft + 'px')
             .style('top', tooltipTop + "px");
+        updateTooltipChart(tooltipCharSvg, d);
     }
 }
 
@@ -90,4 +91,59 @@ function getToolTipColorCell(feature, defaultBackgroundColor, field, value) {
         return settings.getColorMapFunction(defaultBackgroundColor)(feature);
     }
     return defaultBackgroundColor;
+}
+
+const TOOLTIP_CHART_WIDTH = 300;
+const TOOLTIP_CHART_HEIGHT = 30;
+
+function createTooltipChartSVG() {
+    return d3.select('#tooltip-newcase-chart').append('svg')
+        .attr('width', TOOLTIP_CHART_WIDTH)
+        .attr('height', TOOLTIP_CHART_HEIGHT)
+        .append('g');
+}
+
+function getHistoryOffsetForPosition(position, maxPosition) {
+    return position - maxPosition + 1;
+}
+
+function updateTooltipChart(tooltipChartSvg, feature) {
+    let field = FieldDetails.increase;
+    let colorField = FieldDetails.increase_per_10k_people;
+    let dataCount = Math.min(40, MapOptions.dateHistory.length);
+    let data = [];
+    let maxValue = 0;
+    for (let i = 0; i < dataCount; i++) {
+        let offset = getHistoryOffsetForPosition(i, dataCount);
+        let value = field.getFieldValue(feature, offset);
+        if (value == null || value < 0) {
+            value = 0;
+        }
+        if (value > maxValue) {
+            maxValue = value;
+        }
+        data.push(value);
+    }
+
+    let barWidth = (TOOLTIP_CHART_WIDTH - dataCount) / dataCount;
+    const x = d3.scaleLinear().domain([0, dataCount]).range([0,TOOLTIP_CHART_WIDTH]);
+    const y = d3.scaleLinear().domain([0, maxValue]).range([0, TOOLTIP_CHART_HEIGHT]);
+
+    let colorValueRetrievalFunction = function(d, i) {
+        let offset = getHistoryOffsetForPosition(i, dataCount);
+        return colorField.getFieldValue(feature, offset);
+    };
+    let colorFunction = colorField.getColorMapFunction('#ffffff', colorValueRetrievalFunction);
+
+    let rect = tooltipChartSvg.selectAll('.bar').data(data);
+    rect.enter()
+        .append('rect')
+        .classed('bar', true)
+        .merge(rect)
+        .attr('x', (d, i) => x(i))
+        .attr('y', d => TOOLTIP_CHART_HEIGHT - y(d))
+        .attr('width', barWidth)
+        .attr('height', d => y(d))
+        .attr('fill', colorFunction);
+    rect.exit().remove();
 }

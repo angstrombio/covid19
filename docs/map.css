@@ -6,7 +6,7 @@ div.tooltip {
     position: absolute;
     text-align: center;
     width: 325px;
-    height: 225px;
+    height: 265px;
     padding: 4px;
     font: 12px sans-serif;
     border: 0;
@@ -58,12 +58,33 @@ div.tooltip {
     width: 12px;
     height: 12px;
 }
+.tooltip-chart-label-cell {
+    text-align: center;
+    font-style: italic;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.tooltip-newcase-chart-cell {
+    width: 300px;
+    height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
 .svg-container {
     display: inline-block;
     position: relative;
     width: 100%;
     /*padding-bottom: 100%; /* aspect ratio */
     padding-bottom: 60%;
+    vertical-align: top;
+    overflow: hidden;
+}
+.tooltip-svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    height: 100%;
     vertical-align: top;
     overflow: hidden;
 }
