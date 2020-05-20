@@ -3,15 +3,20 @@
  */
 
 /**
- * Enables the display of our data tables.
+ * Initializes the table controls.
  */
-function enableTables() {
-    MapOptions.showTables = true;
+function initializeTableControls() {
+    $("#show-hide-tables").click(function() {
+        if (MapOptions.showTables) {
+            disableTables(true);
+        } else {
+            enableTables(true, true);
+        }
+    });
     MapOptions.tableFields = [
         FieldDetails.area, FieldDetails.cases, FieldDetails.cases_per_10k_people, FieldDetails.increase,
         FieldDetails.increase_per_10k_people, FieldDetails.new_rate_change, FieldDetails.deaths, FieldDetails.deaths_increase,
         FieldDetails.deaths_per_10k_people, FieldDetails.deaths_per_case, FieldDetails.cases_per_icu_bed,
-        FieldDetails.cases_per_bed, FieldDetails.hospitals, FieldDetails.hospital_beds, FieldDetails.icu_beds,
         FieldDetails.population, ];
 
     let table = d3.select("#county-tables")
@@ -21,30 +26,73 @@ function enableTables() {
         .classed('table', true)
         .classed('table-bordered', true);
 
-    table.append('thead').append('tr')
+    table.append('thead').classed('thead-dark', true).append('tr')
         .selectAll('th')
         .data(MapOptions.tableFields)
         .enter()
         .append('th')
+        .classed('table-header-link', true)
+        .classed('bg-secondary', true)
+        .attr('id', function(field) { return 'table-header-' + field.getFieldId() })
+        .on('click', function(field) {
+            if (field.getFieldId() !== 'area') {
+                fieldSelected(field.getFieldId());
+            }
+        })
         .text(function(field) { return field.getLabel()});
 
     table.append('tbody').attr('id','county-table-body');
-
-    d3.select('#county-table-max').on('change',function() {
-        updateTable();
-    });
+    if (MapOptions.tablesShowSelections) {
+        $('#table-type-selected').click();
+        d3.select("#selected-table-controls").style('visibility', 'visible');
+    }
     $("input[name=table-type]:radio").change(function() {
         useSelections =  d3.select("#table-type-selected").property('checked');
         MapOptions.tablesShowSelections = useSelections;
-        d3.select("#top-table-controls").style('visibility', useSelections ? 'hidden' : 'visible');
         d3.select("#selected-table-controls").style('visibility', useSelections ? 'visible' : 'hidden');
+        updateUrlState();
         updateTable();
     });
     $("#reset-selections").click(function() {
         console.log('reset');
         MapOptions.selectedAreaIds = [];
+        updateUrlState();
         updateTable();
     });
+
+    if (MapOptions.showTables) {
+        enableTables(false);
+    }
+
+}
+
+/**
+ * Enables the display of our data tables.
+ */
+function enableTables(shouldUpdateState = false, shouldUpdateTables = false) {
+    MapOptions.showTables = true;
+    $('#compare-regions-title').show();
+    $('#county-tables').show();
+    $('#show-hide-tables').html('<small>Hide</small>');
+    if (shouldUpdateState) {
+        updateUrlState();
+    }
+    if (shouldUpdateTables) {
+        updateTable();
+    }
+}
+
+/**
+ * Hides the data tables.
+ */
+function disableTables(shouldUpdateState = false) {
+    MapOptions.showTables = false;
+    $('#county-tables').hide();
+    $('#compare-regions-title').hide();
+    $('#show-hide-tables').html('<small>Show Region Comparison Tables</small>');
+    if (shouldUpdateState) {
+        updateUrlState();
+    }
 }
 
 /**
@@ -53,7 +101,7 @@ function enableTables() {
  */
 function getTopTableData() {
     let field = MapOptions.currentField;
-    let numRows = Number.parseInt(d3.select("#county-table-max").property('value'));
+    let numRows = MapOptions.numTableRows;
     if (Number.isNaN(numRows)) {
         numRows = 25;
     }

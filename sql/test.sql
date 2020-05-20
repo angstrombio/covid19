@@ -43,3 +43,5 @@ select * from covid19.census_msa m
 left outer join covid19.census_msa_counties c on m.cbsa=c.cbsa
 where msa_name like '%, UT';
 select * from covid19.census_msa_counties;
+
+

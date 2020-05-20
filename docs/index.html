@@ -44,13 +44,7 @@
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <div class="col-sm-9 align-items-center text-heading"><h3>Mapping Localized COVID-19 Risk in the U.S.</h3></div>
-                    <div class="col-sm-3 align-items-center">
-                        <!--<button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" area-haspopup="true" area-expanded="false" id="field-selector-dropdown">
-                            Cases per ICU Bed
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="field-selector-dropdown" id="field-selector-options">
-                        </div>-->
-                    </div>
+                    <div class="col-sm-3 align-items-center"></div>
                 </div>
             </div>
             <div id="map-content" class="container"></div>
@@ -77,8 +71,7 @@
                                 <a class="dropdown-item field-selector-item" id="field-selector-population" onClick="fieldSelected('population');"><small>Population</small></a>
                             </div>
                         </div>
-                                            </div>
-
+                    </div>
                 </div>
                 <div class="row d-none d-md-flex justify-content-center text-nowrap">
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-increase" onclick="fieldSelected('increase');">New Cases</button>
@@ -119,6 +112,37 @@
                             <small><i>Move slider or click play to see values over time</i></small>
                         </div>
                         <div class="col-sm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container" id="compare-regions-title-div">
+                <h3 class="text-heading">
+                    <span id="compare-regions-title" style="display: none;">Compare Regions</span>
+                    <button class="btn btn-secondary btn-sm" id="show-hide-tables"><small>Show Region Comparison Tables</small></button>
+                </h3>
+            </div>
+
+            <div class="container" id="county-tables" style="display: none;">
+                <div class="row">
+                    <div class="col-sm">
+                        <small>
+                            Display:
+                        </small>
+                        <div class="btn-group btn-group-toggle" data-toggle="buttons" id="table-type-selector">
+                            <label class="btn btn-secondary btn-sm active">
+                                <input type="radio" name="table-type" id="table-type-top" class="table-inputs" autocomplete="off">
+                                <small>Top 25 Regions (Selected Layer)</small>
+                            </label>
+                            <label class="btn btn-secondary btn-sm">
+                                <input type="radio" name="table-type" id="table-type-selected" class="table-inputs" autocomplete="off">
+                                <small>Selected Regions</small>
+                            </label>
+                        </div>
+                        <span id="selected-table-controls" style="visibility: hidden;">
+                            <small>Click on counties on the map above to select or de-select them.</small>
+                            <button class="btn btn-secondary btn-sm" id="reset-selections"><small>Reset</small></button>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -315,6 +339,7 @@
                 <h3 class="text-heading">Change History</h3>
                 <div class="py-2 text-content">
                     <ul>
+                        <li>2020-05-19: Added support for displaying detail information comparing regions in tables below the map.</li>
                         <li>2020-05-11: Changed field controls on mobile devices for ease of use.  Added historical new case data charts to tooltips.</li>
                         <li>2020-05-07: Removed doubling rate; added change in new case rates.  Adjusted display of tooltips and default fields for ease of use.</li>
                         <li>2020-04-19: Added deaths per case metric</li>
@@ -412,6 +437,7 @@
     <script src="controls.js"></script>
     <script src="timeline.js"></script>
     <script src="tooltips.js"></script>
+    <script src="tables.js"></script>
     <script>initializeMap();</script>
 </body>
 </html>

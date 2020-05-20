@@ -137,3 +137,9 @@ div.tooltip {
 .slider::-moz-range-thumb {
   background: #900;
 }
+.table-header-link {
+
+}
+.table-header-link-selected {
+    background-color: #900 !important;
+}

@@ -8,6 +8,7 @@
 MapOptions = {
     targetWidth: 1000,
     targetHeight: 600,
+    numTableRows: 25,
 
     currentField: FieldDetails.new_rate_change,
     lastUpdateDate: null,
@@ -80,6 +81,7 @@ function regionClicked(d) {
         }
         if (MapOptions.tablesShowSelections) {
             updateTable();
+            updateUrlState();
         }
     }
 }
@@ -143,6 +145,7 @@ function drawMap(svg, geojson, states) {
 
     setupZoomButtons(svg, baseGroup, zoom);
     drawLegend(field, baseGroup);
+    initializeTableControls();
 }
 
 /**
@@ -213,14 +216,10 @@ function updateMap() {
 
 /**
  * Initializes all of our map controls, loads data from the server, and draws the map/related controls.
- *
- * @param shouldDrawTables  If true, we are drawing data tables below the map (not used on all pages).
  */
-function initializeMap(shouldDrawTables = false) {
-    MapOptions.showTables = shouldDrawTables;
+function initializeMap() {
     initializeControls();
     let svg = drawEmptyMapPlaceholder();
-    const urlParams = new URLSearchParams(window.location.search);
     let metadataUrl = 'data/metadata.json';
 
     d3.json(metadataUrl, function (metadata) {
@@ -230,7 +229,6 @@ function initializeMap(shouldDrawTables = false) {
             d3.json('data/states.geojson', function(states) {
                 drawMap(svg, geojson, states);
                 if (MapOptions.showTables) {
-                    enableTables();
                     updateTable();
                 }
             });

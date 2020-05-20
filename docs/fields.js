@@ -383,7 +383,7 @@ class Field {
  * Holds all of the defined fields for use throughout the system.
  */
 FieldDetails = {
-    area: new Field('area',"Area/County").setTextFormat(),
+    area: new Field('area',"Region").setTextFormat(),
     area_type: new Field('area_type',"Type").setTextFormat(),
     cases: new Field('cases',"Total Cases").setColorScheme(d3.interpolateGreys).setIntFormat(),
     deaths: new Field('deaths',"Deaths").setColorScheme(d3.interpolateBlues).setIntFormat(),
