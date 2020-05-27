@@ -85,7 +85,7 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
         state = row[2]
         country = row[3]
         if country == 'US':
-            if fips is None or fips == '':
+            if fips is None or fips == '' or fips == '90049':
                 if state in overrides:
                     state_overrides = overrides[state]
                     if county in state_overrides:

@@ -142,7 +142,7 @@ def parse_county_format(db, file_date, lines):
             state = row[2]
             country = row[3]
             if country == 'US':
-                if fips is None or fips == '':
+                if fips is None or fips == '' or fips == '90049':
                     if state in OVERRIDES:
                         state_overrides = OVERRIDES[state]
                         if county in state_overrides:
@@ -153,11 +153,13 @@ def parse_county_format(db, file_date, lines):
                             else:
                                 fips = new_fips
                         else:
+                            if fips is None or fips == '':
+                                print()
+                                print("NO MATCHING FIPS: " + state + "." + county)
+                    else:
+                        if fips is None or fips == '':
                             print()
                             print("NO MATCHING FIPS: " + state + "." + county)
-                    else:
-                        print()
-                        print("NO MATCHING FIPS: " + state + "." + county)
 
                 elif len(fips) == 4:
                     # Sometimes fips is too short - because it wasn't 0 padded
