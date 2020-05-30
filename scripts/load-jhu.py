@@ -78,7 +78,8 @@ def load_file(db, source, file_date, reload, skip_existing):
     elif header == "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered,Latitude,Longitude":
         parse_original_format(db, file_date, lines, True)
 
-    elif header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key":
+    elif header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key" or \
+            header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incidence_Rate,Case-Fatality_Ratio":
         parse_county_format(db, file_date, lines)
 
     else:

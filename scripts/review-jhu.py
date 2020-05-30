@@ -50,7 +50,8 @@ def review(source):
 
         header = lines[0].strip()
         lines.pop(0)
-        if header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key":
+        if header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key" or \
+                header == "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incidence_Rate,Case-Fatality_Ratio":
             parse_counties(lines, all_counties, OVERRIDES, OVERRIDE_COUNTIES_WITH_DATA)
 
         else:
