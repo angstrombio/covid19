@@ -17,7 +17,7 @@ function initializeTableControls() {
         FieldDetails.area, FieldDetails.cases, FieldDetails.cases_per_10k_people, FieldDetails.increase,
         FieldDetails.increase_per_10k_people, FieldDetails.new_rate_change, FieldDetails.deaths, FieldDetails.deaths_increase,
         FieldDetails.deaths_per_10k_people, FieldDetails.deaths_per_case, FieldDetails.cases_per_icu_bed,
-        FieldDetails.population, ];
+        FieldDetails.population, FieldDetails.increase_per_icu_bed ];
 
     let table = d3.select("#county-tables")
         .append('small')

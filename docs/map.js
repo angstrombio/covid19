@@ -33,8 +33,7 @@ function updateMetadata(metadata) {
 
     for (field in FieldDetails) {
         if (metadata[field] != null) {
-            FieldDetails[field].dataMin = metadata[field].min;
-            FieldDetails[field].dataMax = metadata[field].max;
+            FieldDetails[field].setMetadata(metadata[field].min, metadata[field].max);
         }
     }
 

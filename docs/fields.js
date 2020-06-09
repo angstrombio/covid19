@@ -377,6 +377,12 @@ class Field {
         this.useWideLegend = value;
         return this;
     }
+
+    setMetadata(dataMinValue, dataMaxValue) {
+        this.dataMin = dataMinValue;
+        this.dataMax = dataMaxValue;
+        return this;
+    }
 }
 
 /**
@@ -404,3 +410,5 @@ FieldDetails.cases_per_icu_bed = new Field('cases_per_icu_bed',"Cases per ICU Be
 FieldDetails.deaths_increase = new Field('deaths_increase',"New Deaths").setColorScheme(d3.interpolateBlues).setIntFormat(true).setIncreaseDataFunction(FieldDetails.deaths);
 FieldDetails.deaths_per_10k_people = new Field('deaths_per_10k_people', "Deaths per 10,000").setColorScheme(d3.interpolateBlues).setFloatFormat(2).setRatioDataFunction(FieldDetails.deaths, FieldDetails.population, true);
 FieldDetails.deaths_per_case = new Field('deaths_per_case',"Deaths / Case").setColorScheme(d3.interpolateBlues).setPercentFormat(2).setRatioDataFunction(FieldDetails.deaths, FieldDetails.cases, false, 19).setLegendFormat('.2f');
+FieldDetails.increase_per_icu_bed = new Field('increase_per_icu_bed', 'New Cases / ICU Bed').setColorScheme(d3.interpolateReds).setFloatFormat(2).setRatioDataFunction(FieldDetails.increase, FieldDetails.icu_beds).setMetadata(0, 2);
+

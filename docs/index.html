@@ -64,6 +64,7 @@
                                 <a class="dropdown-item field-selector-item" id="field-selector-increase_per_10k_people" onClick="fieldSelected('increase_per_10k_people');"><small>New Cases per 10,000</small></a>
                                 <a class="dropdown-item field-selector-item" id="field-selector-cases" onClick="fieldSelected('cases');"><small>Total Cases</small></a>
                                 <a class="dropdown-item field-selector-item" id="field-selector-cases_per_icu_bed" onClick="fieldSelected('cases_per_icu_bed');"><small>Cases per ICU Bed</small></a>
+                                <a class="dropdown-item field-selector-item" id="field-selector-increase_per_icu_bed" onClick="fieldSelected('increase_per_icu_bed');"><small>New Cases / ICU Bed</small></a>
                                 <a class="dropdown-item field-selector-item" id="field-selector-deaths" onClick="fieldSelected('deaths');"><small>Deaths</small></a>
                                 <a class="dropdown-item field-selector-item" id="field-selector-deaths_increase" onClick="fieldSelected('deaths_increase');"><small>New Deaths</small></a>
                                 <a class="dropdown-item field-selector-item" id="field-selector-deaths_per_10k_people" onClick="fieldSelected('deaths_per_10k_people');"><small>Deaths per 10,000</small></a>
@@ -82,11 +83,12 @@
                 </div>
                 <div class="row d-none d-md-flex justify-content-center text-nowrap">
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-cases_per_icu_bed" onclick="fieldSelected('cases_per_icu_bed');">Cases per ICU Bed</button>
+                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-increase_per_icu_bed" onclick="fieldSelected('increase_per_icu_bed');">New Cases / ICU Bed</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths" onclick="fieldSelected('deaths');">Deaths</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_increase" onclick="fieldSelected('deaths_increase');">New Deaths</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_per_10k_people" onclick="fieldSelected('deaths_per_10k_people');">Deaths per 10,000</button>
                     <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-deaths_per_case" onclick="fieldSelected('deaths_per_case');">Deaths / Case</button>
-                    <button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-population" onclick="fieldSelected('population');">Population</button>
+                    <!--<button type="button" class="btn btn-secondary btn-sm mx-2 my-1" id="field-button-population" onclick="fieldSelected('population');">Population</button>-->
                 </div>
                 <div class="container-fluid py-2">
                     <div class="row justify-content-center ">
@@ -339,6 +341,7 @@
                 <h3 class="text-heading">Change History</h3>
                 <div class="py-2 text-content">
                     <ul>
+                        <li>2020-06-09: Added support for displaying new cases per ICU bed, as a measure of local risk</li>
                         <li>2020-05-19: Added support for displaying detail information comparing regions in tables below the map.</li>
                         <li>2020-05-11: Changed field controls on mobile devices for ease of use.  Added historical new case data charts to tooltips.</li>
                         <li>2020-05-07: Removed doubling rate; added change in new case rates.  Adjusted display of tooltips and default fields for ease of use.</li>
@@ -382,6 +385,11 @@
                         <td class="tooltip-label-cell text-nowrap">Cases per ICU Bed: </td>
                         <td><div class="tooltip-color-cell" id="tooltip-colorblock-cases_per_icu_bed"></div></td>
                         <td class="tooltip-value-cell text-nowrap" id="tooltip-value-cases_per_icu_bed"></td>
+                    </tr>
+                    <tr>
+                        <td class="tooltip-label-cell text-nowrap">New Cases per ICU Bed: </td>
+                        <td><div class="tooltip-color-cell" id="tooltip-colorblock-increase_per_icu_bed"></div></td>
+                        <td class="tooltip-value-cell text-nowrap" id="tooltip-value-increase_per_icu_bed"></td>
                     </tr>
                     <tr>
                         <td class="tooltip-label-cell text-nowrap">Cases per Hospital Bed: </td>
