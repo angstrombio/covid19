@@ -7,18 +7,25 @@ import coronadb
 from jhudata import OVERRIDES
 
 
-def load(source, dbhost, dbport, dbname, dbuser, dbpw, clean, reload, skip_existing, skip_mv):
+def load(source, dbhost, dbport, dbname, dbuser, dbpw, skip_mv):
     with get_db_connection(dbhost, dbport, dbname, dbuser, dbpw) as conn:
-        if clean:
-            clear_all_data(conn)
-
         if os.path.isdir(source):
-            load_all(conn, source, reload, skip_existing)
+            load_all(conn, source)
         elif os.path.isfile(source):
-            load_file(conn, source, get_filedate(os.path.basename(source)), reload, skip_existing)
+            load_file(conn, source, get_filedate(os.path.basename(source)))
         else:
-            print("Invalid source location")
-            return False
+            # Can we make this a file, using environment information?
+            base_dir = os.environ.get('JHU_DIR')
+            if base_dir is not None and os.path.isdir(base_dir):
+                full_source = os.path.join(base_dir, source)
+                if os.path.isfile(full_source):
+                    load_file(conn, full_source, get_filedate(os.path.basename(full_source)))
+                else:
+                    print("Invalid source location")
+                    return False
+            else:
+                print("Invalid source location")
+                return False
 
         if not skip_mv:
             refresh_mv(conn)
@@ -37,7 +44,7 @@ def find_source_dir(jhu_dir):
     return jhu_dir
 
 
-def load_all(db, source, reload, skip_existing):
+def load_all(db, source):
     source = find_source_dir(source)
 
     print("Loading all files from " + source)
@@ -45,7 +52,7 @@ def load_all(db, source, reload, skip_existing):
 
     for filename in sorted(os.listdir(source)):
         if filename.endswith(".csv"):
-            load_file(db, os.path.join(source, filename), get_filedate(filename), reload, skip_existing)
+            load_file(db, os.path.join(source, filename), get_filedate(filename))
             count += 1
 
     if count == 0:
@@ -54,14 +61,9 @@ def load_all(db, source, reload, skip_existing):
         print("Loaded " + str(count) + " files")
 
 
-def load_file(db, source, file_date, reload, skip_existing):
-    if skip_existing and check_existing_data(db, file_date):
-        print("Skipping " + source)
-        return False
-
+def load_file(db, source, file_date):
     print("Loading file " + source)
-    if reload:
-        clear_file_data(db, file_date)
+    clear_file_data(db, file_date)
 
     file = open(source, 'r', encoding="utf-8-sig")
     lines = file.readlines()
@@ -228,11 +230,8 @@ def clear_file_data(db, file_date):
 
 parser = argparse.ArgumentParser(description='Script to load JHU data into the database')
 parser.add_argument("--source", required=True, type=str, help="Directory or single file to load")
-parser.add_argument("--clean", action="store_true", help="If true, clears the data before loading")
-parser.add_argument("--reload", action="store_true", help="If true, deletes any existing data that matches the file date")
-parser.add_argument("--skip_existing", action="store_true", help="If true, skips files containing dates already in the DB")
 parser.add_argument("--skip_mv", action="store_true", help="If true, skips refreshing the stored materialized view (e.g. if a second load will be done afterwards).")
 
 args = parser.parse_args()
 
-load(args.source, coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password, args.clean, args.reload, args.skip_existing, args.skip_mv)
+load(args.source, coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password, args.skip_mv)

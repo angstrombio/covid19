@@ -2,12 +2,23 @@ import argparse
 import csv
 import psycopg2
 import coronadb
+import os
 from jhudata import OVERRIDES
 from jhudata import OVERRIDE_COUNTIES_WITH_DATA
 from jhudata import IGNORED_COUNTIES
 
 
 def review(source):
+    if not os.path.isfile(source):
+        # Can we make this a file, using environment information?
+        base_dir = os.environ.get('JHU_DIR')
+        if base_dir is not None and os.path.isdir(base_dir):
+            source = os.path.join(base_dir, source)
+
+    if not os.path.isfile(source):
+        print("Invalid Source")
+        return False
+
     with get_db_connection(coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password) as db:
         all_counties = {}
         with db.cursor() as cursor:
