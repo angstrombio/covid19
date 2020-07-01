@@ -7,7 +7,7 @@ import os
 from data import DataTracker
 
 
-MAX_HISTORY = 160
+MAX_HISTORY = 180
 
 
 def export_data(areas_geojsonfile, output_folder, overwrite):
