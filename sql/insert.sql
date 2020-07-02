@@ -33,3 +33,7 @@ INSERT INTO covid19.bls_relevant_jobs (occ_code, occ_title, is_provider, is_othe
 
 -- Correct big mistake in JHU data
 update covid19.jhu set cases=103 where fips='12091' and file_date='2020-04-13';
+
+-- Map Rhode Island unassigned onto the single MSA in the state, given the large number of unassigned cases
+INSERT INTO covid19.census_msa_counties (cbsa, fips_stcou, county_name, pop_2018) VALUES ('39300', '90044','Rhode Island Unassigned', 1);
+

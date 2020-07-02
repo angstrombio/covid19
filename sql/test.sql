@@ -22,20 +22,14 @@ select * from covid19.bls_relevant_jobs;
 select * from covid19.bls_areas;
 select * from covid19.bls_oes limit 100;
 
-select *
-from covid19.bls_providers_combined x
 
 select distinct county_name, state_name, fips from covid19.nyt where fips not in (select fips from covid19.census);
 select max(file_date) from covid19.nyt;
-select * from covid19.nyt where file_date='2020-04-05'
+select * from covid19.nyt where file_date='2020-04-05';
 
-select jhu.file_date,jhu.fips, jhu.state, jhu.county, jhu.cases, jhu.deaths, jhu.recovered, jhu.active, nyt.state_name as nyt_state, nyt.county_name as nyt_county, nyt.cases as nyt_cases, nyt.deaths as nyt_deaths 
-from covid19.cases_us_current jhu
-    left outer join covid19.nyt nyt on jhu.fips=nyt.fips and nyt.file_date=jhu.file_date
-where jhu.fips != 'XXXXX' and jhu.fips < '80000'
 
 select file_date, count(*) from covid19.jhu group by file_date order by file_date;
-select * from covid19.cases_and_healthcare_historical_combined order by increase_per_10k_people asc limit 100;
+select * from covid19.cases_and_healthcare_historical_combined order by increase_per_10k_people limit 100;
 
 select * from covid19.census where state='Utah' and county in ('Weber County', 'Morgan County');
 
@@ -44,4 +38,14 @@ left outer join covid19.census_msa_counties c on m.cbsa=c.cbsa
 where msa_name like '%, UT';
 select * from covid19.census_msa_counties;
 
+select *
+from covid19.nyt_jhu_combined_derived d
+inner join covid19.census_msa_counties c on d.fips=c.fips_stcou
+where c.cbsa=35620 and d.fips='36061'
+order by file_date desc, d.state_name, d.county_name;
 
+select * from covid19.nyt_jhu_combined_derived where fips='90044';
+
+select * from covid19.census_msa_counties c where c.county_name like '%RI'
+
+select * from covid19.cases_and_healthcare_historical_combined where cbsa='39300'
