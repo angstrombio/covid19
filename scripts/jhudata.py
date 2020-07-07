@@ -36,8 +36,7 @@ OVERRIDE_COUNTIES_WITH_DATA = [
     '49017',  # Utah county merged into public health authority region in source data.
     '49019',  # Utah county merged into public health authority region in source data.
     '49021',  # Utah county merged into public health authority region in source data.
-    '49025',  # Utah county merged into public health authority region in source data.
-    '26131'
+    '49025'  # Utah county merged into public health authority region in source data.
 ]
 IGNORED_COUNTIES = [
     '66', '69', '72', '78',
