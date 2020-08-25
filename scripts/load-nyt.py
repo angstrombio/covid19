@@ -29,8 +29,6 @@ def load(source, clean, reload):
             print("Invalid source location")
             return False
 
-        #  TODO if neededrefresh_mv(conn)
-
 
 def read_last_line(filename):
     with open(filename, 'rb') as f:
@@ -133,12 +131,6 @@ def clear_all_data(db):
 
     db.commit()
     print("Cleaned database")
-
-
-def refresh_mv(db):
-    print("Refreshing materialized view")
-    with db.cursor() as cursor:
-        cursor.execute("REFRESH MATERIALIZED VIEW covid19.nyt_derived")
 
 
 def remove_data_for_date(db, file_date):

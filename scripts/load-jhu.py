@@ -7,7 +7,7 @@ import coronadb
 from jhudata import OVERRIDES
 
 
-def load(source, dbhost, dbport, dbname, dbuser, dbpw, skip_mv):
+def load(source, dbhost, dbport, dbname, dbuser, dbpw):
     with get_db_connection(dbhost, dbport, dbname, dbuser, dbpw) as conn:
         if os.path.isdir(source):
             load_all(conn, source)
@@ -26,9 +26,6 @@ def load(source, dbhost, dbport, dbname, dbuser, dbpw, skip_mv):
             else:
                 print("Invalid source location")
                 return False
-
-        if not skip_mv:
-            refresh_mv(conn)
 
 
 def find_source_dir(jhu_dir):
@@ -214,12 +211,6 @@ def clear_all_data(db):
     print("Cleaned database")
 
 
-def refresh_mv(db):
-    with db.cursor() as cursor:
-        print("Refreshing materialized view (Combined)")
-        cursor.execute("REFRESH MATERIALIZED VIEW covid19.nyt_jhu_combined_derived")
-
-
 def clear_file_data(db, file_date):
     with db.cursor() as cursor:
         cursor.execute("DELETE FROM covid19.jhu WHERE file_date=%s", (file_date,))
@@ -230,8 +221,7 @@ def clear_file_data(db, file_date):
 
 parser = argparse.ArgumentParser(description='Script to load JHU data into the database')
 parser.add_argument("--source", required=True, type=str, help="Directory or single file to load")
-parser.add_argument("--skip_mv", action="store_true", help="If true, skips refreshing the stored materialized view (e.g. if a second load will be done afterwards).")
 
 args = parser.parse_args()
 
-load(args.source, coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password, args.skip_mv)
+load(args.source, coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password)

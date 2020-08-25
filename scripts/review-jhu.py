@@ -22,7 +22,11 @@ def review(source):
     with get_db_connection(coronadb.host, coronadb.port, coronadb.database, coronadb.user, coronadb.password) as db:
         all_counties = {}
         with db.cursor() as cursor:
-            cursor.execute("select c.fips, c.state, c.county, c.county_num, j.cases, j.file_date from covid19.census c left outer join covid19.jhu_derived j on c.fips=j.fips and j.cases is not null and j.cases > 0 order by c.fips, j.file_date desc")
+            cursor.execute("""
+                SELECT c.fips, c.state, c.county, c.county_num, j.cases, j.file_date 
+                FROM covid19.census c 
+                    LEFT OUTER JOIN covid19.jhu j ON c.fips=j.fips AND j.cases is not null AND j.cases > 0 AND j.country = 'US'
+                ORDER BY c.fips, j.file_date DESC""")
             rows = cursor.fetchall()
 
             last_fips = 'XXXXX'

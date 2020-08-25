@@ -20,13 +20,13 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
     if output_folder is None or output_folder == "":
         output_folder = '../docs/data'
 
-    metadata = {
-        "last_file_date": None,
-        "file_date_history": None,
-    }
-
     with psycopg2.connect(dbname=coronadb.database, port=coronadb.port, user=coronadb.user, host=coronadb.host,
                           password=coronadb.password) as db:
+
+        metadata = {
+            "last_file_date": None,
+            "file_date_history": None,
+        }
 
         file_date, history_dates, all_dates_str = get_file_dates(db, metadata)
         print("Exporting data for " + file_date)
@@ -48,12 +48,10 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
         count = 1
         with db.cursor() as cursor:
             cursor.execute("""SELECT GEOID, area_name, area_type, population,
-                    file_date, cases, cases_per_10k_people, deaths, recovered, active,
-                    increase_yesterday, num_hospitals, staffed_beds, icu_beds,  
-                    cases_per_staffed_bed, cases_per_icu_bed, increase_per_10k_people,
-                    deaths_today, deaths_per_10k_people, deaths_per_case
-                    FROM covid19.cases_and_healthcare_historical_combined WHERE file_date in (""" + all_dates_str + """) 
+                    file_date, cases, deaths, num_hospitals, staffed_beds, icu_beds
+                    FROM covid19.cases_and_healthcare_historical_combined_simple WHERE file_date in (""" + all_dates_str + """) 
                      ORDER BY GEOID, file_date DESC""")
+
 
             for row in cursor.fetchall():
                 print(count, end='\r')
@@ -61,7 +59,7 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
                 if area_id in all_data:
                     data = all_data[area_id]
                 else:
-                    data = DataTracker(file_date, history_dates, metadata, area_id)
+                    data = DataTracker(file_date, history_dates, area_id, metadata)
                     all_data[area_id] = data
 
                 data.add_data_row(row)
@@ -99,7 +97,7 @@ def export_data(areas_geojsonfile, output_folder, overwrite):
 
 def get_file_dates(db, metadata):
     with db.cursor() as cursor:
-        cursor.execute("SELECT DISTINCT file_date FROM covid19.cases_and_healthcare_historical_by_county ORDER BY file_date DESC")
+        cursor.execute("SELECT DISTINCT file_date FROM covid19.cases_and_healthcare_historical_combined_simple ORDER BY file_date DESC")
         rows = cursor.fetchall()
         if rows is None:
             return None

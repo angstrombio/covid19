@@ -5,34 +5,29 @@ FIELDS = [
     {'name': 'area_type', 'position': 2, 'include_metadata': False, 'include_history': False},
     {'name': 'population', 'position': 3, 'include_history': False},
     {'name': 'cases', 'position': 5, 'round_digits': 2},
-    {'name': 'cases_per_10k_people', 'position': 6, 'round_digits': 2, 'metadata_only': True},
-    {'name': 'deaths', 'position': 7, },
-    # {'name': 'recovered', 'position': 8, },
-    # {'name': 'active', 'position': 9, },
-    {'name': 'increase', 'position': 10, 'metadata_only': True},
-    {'name': 'hospitals', 'position': 11, 'include_history': False},
-    {'name': 'hospital_beds', 'position': 12, 'include_history': False},
-    {'name': 'icu_beds', 'position': 13, 'include_history': False},
-    {'name': 'cases_per_bed', 'position': 14, 'round_digits': 2, 'metadata_only': True},
-    {'name': 'cases_per_icu_bed', 'position': 15, 'round_digits': 2, 'metadata_only': True},
-    {'name': 'increase_per_10k_people', 'position': 16, 'round_digits': 3, 'metadata_only': True},
-    {'name': 'deaths_increase', 'position': 17, 'metadata_only': True},
-    {'name': 'deaths_per_10k_people', 'position': 18, 'round_digits': 3, 'metadata_only': True},
-    {'name': 'deaths_per_case', 'position': 19, 'round_digits': 4, 'metadata_only': True}
+    {'name': 'deaths', 'position': 6, },
+    {'name': 'hospitals', 'position': 7, 'include_history': False},
+    {'name': 'hospital_beds', 'position': 8, 'include_history': False},
+    {'name': 'icu_beds', 'position': 9, 'include_history': False},
 ]
-FILE_DATE_POSITION = 4
 
+DERIVED_METADATA_FIELDS = [
+    'cases_per_bed', 'cases_per_icu_bed', 'cases_per_10k_people', 'increase', 'increase_per_10k_people',
+    'deaths_increase', 'deaths_per_10k_people', 'deaths_per_case']
+
+FILE_DATE_POSITION = 4
 
 class DataTracker:
 
-    def __init__(self, expected_current_date, expected_history_dates, metadata, area_id):
+    def __init__(self, expected_current_date, expected_history_dates, area_id, base_metadata):
         self.expected_dates = []
         self.expected_dates.append(expected_current_date)
         for date in expected_history_dates:
             self.expected_dates.append(date)
 
         self.area_id = area_id
-        self.metadata = metadata
+        self.metadata = base_metadata
+
         self.data = []
 
     def _extract_data_for_row(self, row, is_first):
@@ -80,8 +75,11 @@ class DataTracker:
         while target_position >= len(self.data):
             self.data.append(data_for_row)
 
+
+
     def to_properties(self):
         properties = {'id': self.area_id}
+        self.update_metadata()
         daily_new_rate_change = self._calculate_daily_new_rate_change()
 
         for field in FIELDS:
@@ -112,6 +110,85 @@ class DataTracker:
                 properties['new_rate_change_history'] = daily_new_rate_change[1:len(daily_new_rate_change)]
 
         return properties
+
+    def _extract_first_day_field_from_row_if_exists(self, row, field):
+        if len(row) > 0:
+            return self._extract_field_from_day_if_exists(row[0], field)
+        else:
+            return 0
+
+    def _extract_field_from_day_if_exists(self, day, field):
+        if field in day:
+            return day[field]
+        else:
+            return 0
+
+    def _add_derived_ratio(self, derived, field, numerator, denominator):
+        if numerator > 0 and denominator > 0:
+            derived[field] = numerator / denominator
+
+    def update_metadata(self):
+        # Add the derived metadata as needed
+
+        # Single data points we need
+        num_beds = self._extract_first_day_field_from_row_if_exists(self.data, 'hospital_beds')
+        num_icu_beds = self._extract_first_day_field_from_row_if_exists(self.data, 'icu_beds')
+        population = self._extract_first_day_field_from_row_if_exists(self.data, 'population')
+        pop_10k = population / 10000
+
+        prior_cases = 0
+        prior_deaths = 0
+
+        # Reverse order to make calculating increases easy
+        for data_day in self.data[::-1]:
+            cases = self._extract_field_from_day_if_exists(data_day, 'cases')
+            if cases < 0:
+                cases = 0
+            deaths = self._extract_field_from_day_if_exists(data_day, 'deaths')
+            if deaths < 0:
+                deaths = 0
+            cases_minus_deaths = cases - deaths
+            if cases_minus_deaths < 0:
+                cases_minus_deaths = 0
+
+            increase = cases - prior_cases
+            # For metadata, don't save negative increases
+            if increase < 0:
+                increase = 0
+            # We actually want to save increase for use in other calculations
+            data_day['increase'] = increase
+
+            deaths_increase = deaths - prior_deaths
+            if deaths_increase < 0:
+                deaths_increase = 0
+            derived = {}
+            derived['increase'] = increase
+
+            derived['deaths_increase'] = deaths_increase
+            self._add_derived_ratio(derived, 'cases_per_bed', cases_minus_deaths, num_beds)
+            self._add_derived_ratio(derived, 'cases_per_icu_bed', cases_minus_deaths, num_icu_beds)
+            self._add_derived_ratio(derived, 'cases_per_10k_people', cases, pop_10k)
+            self._add_derived_ratio(derived, 'increase_per_10k_people', increase, pop_10k)
+            self._add_derived_ratio(derived, 'deaths_per_10k_people', deaths, pop_10k)
+            if cases >= 20:
+                self._add_derived_ratio(derived, 'deaths_per_case', deaths, cases)
+
+            prior_cases = cases
+            prior_deaths = deaths
+
+            # Now update metadata
+            for field in DERIVED_METADATA_FIELDS:
+                if field not in self.metadata:
+                    self.metadata[field] = {'min': 0, 'max': 0}
+                if field in derived:
+                    current = derived[field]
+                    if current < self.metadata[field]['min']:
+                        self.metadata[field]['min'] = current
+                    if current > self.metadata[field]['max']:
+                        self.metadata[field]['max'] = current
+
+
+
 
     def _calculate_daily_new_rate_change(self):
         # Calculate the average daily new cases over the last 7 days,
@@ -165,3 +242,6 @@ def get_optional(obj, prop, default_value=None):
         return obj[prop]
     else:
         return default_value
+
+
+
