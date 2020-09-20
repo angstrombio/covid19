@@ -18,9 +18,10 @@ OVERRIDES = {
         },
     "Utah":
         {
+            "Unassigned": "XXXXX",
             "Bear River": "49003",  # TODO Better mappings
             "Southwest Utah": "49053",  # TODO Better mappings
-            "Southwest": "49053",  # TODO Better mappings
+            # "Southwest": "49053",  # TODO Better mappings
             "Southeast Utah": "49007",  # TODO Better mappings
             "Central Utah": "49039",  # TODO Better mappings
             "TriCounty": "49047",  # TODO Better mappings
@@ -29,6 +30,7 @@ OVERRIDES = {
 }
 
 OVERRIDE_COUNTIES_WITH_DATA = [
+    '25019',
     '49001', 
     '49005',  # Utah county merged into public health authority region in source data.
     '49013',  # Utah county merged into public health authority region in source data.
