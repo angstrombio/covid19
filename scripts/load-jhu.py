@@ -96,7 +96,7 @@ def parse_number(original):
         return None
 
     try:
-        return int(original)
+        return int(float(original))
     except ValueError:
         print("Silently converting \"" + original + "\" to None")
         return None
