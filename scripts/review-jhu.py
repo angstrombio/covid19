@@ -143,6 +143,8 @@ def parse_counties(lines, all_counties, overrides, overrides_without_data):
                         print("County details not found for FIPS=" + fips + ", " + state + " " + county)
 
             recovered = parse_number(row[9])
+            if recovered is None:
+                recovered = 0
             if recovered > 0:
                 print("Found active/recovered data for " + fips + ", " + state + " " + county)
 
