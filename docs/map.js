@@ -10,7 +10,7 @@ MapOptions = {
     targetHeight: 600,
     numTableRows: 25,
 
-    currentField: FieldDetails.new_rate_change,
+    currentField: FieldDetails.increase_per_10k_people,
     lastUpdateDate: null,
     dateHistory: [],
 
@@ -38,7 +38,7 @@ function updateMetadata(metadata) {
     }
 
     d3.select("#map-text").append('span').html(MapOptions.lastUpdateDate);
-    setTimelineRange(0, MapOptions.dateHistory.length);
+    setTimelineRange(0, MapOptions.dateHistor.length);
 }
 
 /**
