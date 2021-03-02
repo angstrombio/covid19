@@ -38,7 +38,7 @@ function updateMetadata(metadata) {
     }
 
     d3.select("#map-text").append('span').html(MapOptions.lastUpdateDate);
-    setTimelineRange(0, MapOptions.dateHistor.length);
+    setTimelineRange(0, MapOptions.dateHistory.length);
 }
 
 /**
